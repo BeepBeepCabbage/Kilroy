@@ -10,17 +10,6 @@ all_sprites_list = pygame.sprite.Group()
 img_dir = path.join(path.dirname(__file__), 'H:\\Images')
 
 
-class Player(pygame.sprite.Sprite):
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface([20, 20])
-        self.image.fill(BLACK)
-        self.rect = self.image.get_rect()
-        self.rect.x = 100
-        self.rect.y = 100
-        self.speed_x = 0
-        self.speed_y = 0
-
 # ======================define colors===================
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
