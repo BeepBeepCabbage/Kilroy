@@ -1,7 +1,4 @@
-import math
-import random
 from os import path
-
 import pygame
 
 # from all_classes import *
@@ -19,15 +16,17 @@ pygame.display.set_caption("Kilroy")
 clock = pygame.time.Clock()
 
 # =========================Sprites Images=====================
-img_dir = path.join(path.dirname(__file__), 'H:\\Images')
+img_dir = path.join(path.dirname(__file__), 'C:\\Users\\Dank Memes\\Downloads\\Game_Img')
 
-background = pygame.image.load(path.join(img_dir, "plat_back.png")).convert()
-background = pygame.transform.scale(background, (840, 480))
-
-aim_img = pygame.image.load(path.join(img_dir, "aim.png")).convert()
+aim_img = pygame.image.load(path.join(img_dir, "aim.jpg")).convert()
 aim_img = pygame.transform.scale(aim_img, (40, 40))
+space_back = pygame.image.load(path.join(img_dir, "Space_back.jpg")).convert()
+space_back = pygame.transform.scale(space_back, (WIDTH, HEIGHT))
 
 pygame.mouse.set_visible(0)
+
+# ======================Define Variables=================
+gravity = -6.6
 
 
 # ======================Define Sprites===================
@@ -40,21 +39,22 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = 100
         self.rect.y = 100
         self.speed_x = 0
-        self.speed_y = 0
+        self.speed_y = -100
 
     def update(self):
         keystate = pygame.key.get_pressed()
-        self.rect.y += gravity
         if keystate[pygame.K_RIGHT]:
-            print(self.rect.y)
             self.speed_x = 7
             self.rect.x += self.speed_x
         if keystate[pygame.K_LEFT]:
             self.speed_x = -7
             self.rect.x += self.speed_x
-        if keystate[pygame.K_SPACE]:
-            self.speed_y = 10
-            self.rect.y -= self.speed_y
+        if self.rect.bottom >= 540:
+            self.rect.bottom = 540
+        if self.rect.left <= 0:
+            self.rect.left = 0
+        if self.rect.right >= WIDTH:
+            self.rect.right = WIDTH
 
 
 class Mouse(pygame.sprite.Sprite):
@@ -71,6 +71,7 @@ class Mouse(pygame.sprite.Sprite):
         self.rect.center = pygame.mouse.get_pos()
 
 
+# ===============Add all Colors=========
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
@@ -78,9 +79,8 @@ BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
 GRAY = (128, 128, 128)
 
-all_sprites_list = pygame.sprite.Group()
-
 # ===============Add all Sprites=========
+all_sprites_list = pygame.sprite.Group()
 kilroy = Player()
 all_sprites_list.add(kilroy)
 mouse = Mouse()
@@ -94,8 +94,11 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.KEYDOWN and kilroy.rect.bottom >= 540:
+            if event.key == pygame.K_SPACE:
+                kilroy.rect.y += kilroy.speed_y
+    kilroy.rect.y -= gravity
     all_sprites_list.update()
     all_sprites_list.draw(screen)
     pygame.display.flip()
-
 pygame.quit()
