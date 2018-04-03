@@ -16,16 +16,18 @@ pygame.display.set_caption("Kilroy")
 clock = pygame.time.Clock()
 
 # =========================Sprites Images=====================
-img_dir = path.join(path.dirname(__file__), 'C:\\Users\\Dank Memes\\Downloads\\Game_Img')
+img_dir = path.join(path.dirname(__file__), 'H:\\Images')
 
 aim_img = pygame.image.load(path.join(img_dir, "aim.jpg")).convert()
 aim_img = pygame.transform.scale(aim_img, (40, 40))
-space_back = pygame.image.load(path.join(img_dir, "Space_back.jpg")).convert()
-space_back = pygame.transform.scale(space_back, (WIDTH, HEIGHT))
-
-pygame.mouse.set_visible(0)
+space_back = pygame.image.load(path.join(img_dir, "colored_castle.png")).convert()
+space_back = pygame.transform.scale(space_back, [1200, HEIGHT])
 
 # ======================Define Variables=================
+pygame.mouse.set_visible(0)
+
+stage_pos_x = 0
+
 gravity = -6.6
 
 
@@ -44,11 +46,12 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         keystate = pygame.key.get_pressed()
         if keystate[pygame.K_RIGHT]:
-            self.speed_x = 7
-            self.rect.x += self.speed_x
-        if keystate[pygame.K_LEFT]:
-            self.speed_x = -7
-            self.rect.x += self.speed_x
+            self.speed_x = 5
+        elif keystate[pygame.K_LEFT]:
+            self.speed_x = -5
+        else:
+            self.speed_x = 0
+        self.rect.x += self.speed_x
         if self.rect.bottom >= 540:
             self.rect.bottom = 540
         if self.rect.left <= 0:
@@ -89,7 +92,7 @@ all_sprites_list.add(mouse)
 # =========================game loop=====================
 running = True
 while running:
-    screen.fill(BLUE)
+    screen.fill(BLACK)
     clock.tick(FPS)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -98,6 +101,12 @@ while running:
             if event.key == pygame.K_SPACE:
                 kilroy.rect.y += kilroy.speed_y
     kilroy.rect.y -= gravity
+    if stage_pos_x <= -400:
+        stage_pos_x = -400
+    elif kilroy.rect.x >= WIDTH / 2:
+        stage_pos_x -= kilroy.speed_x
+        kilroy.rect.x = WIDTH / 2
+    screen.blit(space_back, [stage_pos_x, 0])
     all_sprites_list.update()
     all_sprites_list.draw(screen)
     pygame.display.flip()
