@@ -128,10 +128,11 @@ pmx, pmy = x, y
 dx, dy = 0, 0
 distance = 0
 speed = 14
-
+last_update = pygame.time.get_ticks()
 # =========================game loop=====================
 running = True
 while running:
+    now = pygame.time.get_ticks()
     screen.fill(BLACK)
     clock.tick(FPS)
     for event in pygame.event.get():
@@ -140,7 +141,8 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_w and kilroy.rect.bottom >= 540:
                 kilroy.rect.y += kilroy.speed_y
-            if event.key == pygame.K_SPACE:
+            if event.key == pygame.K_SPACE and now - last_update > 900:
+                last_update = pygame.time.get_ticks()
                 all_sprites_list.add(bullet)
                 mx, my = pygame.mouse.get_pos()
                 bullet.rect.center = kilroy.rect.center
