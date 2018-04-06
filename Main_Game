@@ -1,11 +1,13 @@
+import math
 from os import path
+
 import pygame
 
 # from all_classes import *
 
 WIDTH = 800
 HEIGHT = 600
-FPS = 30
+FPS = 60
 
 # ===============initialize pygame and create window=========
 pygame.init()
@@ -15,20 +17,26 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Kilroy")
 clock = pygame.time.Clock()
 
+# ===========Add all Colors=========
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+BLUE = (0, 0, 255)
+GREEN = (0, 255, 0)
+GRAY = (128, 128, 128)
+
 # =========================Sprites Images=====================
 img_dir = path.join(path.dirname(__file__), 'H:\\Images')
 
 aim_img = pygame.image.load(path.join(img_dir, "aim.jpg")).convert()
 aim_img = pygame.transform.scale(aim_img, (40, 40))
-space_back = pygame.image.load(path.join(img_dir, "colored_castle.png")).convert()
+
+space_back = pygame.image.load(path.join(img_dir, "full-background.png")).convert()
 space_back = pygame.transform.scale(space_back, [1200, HEIGHT])
 
-# ======================Define Variables=================
-pygame.mouse.set_visible(0)
-
-stage_pos_x = 0
-
-gravity = -6.6
+bullet_img = pygame.image.load(path.join(img_dir, "bullet.png")).convert()
+bullet_img = pygame.transform.scale(bullet_img, [30, 30])
+bullet_img = pygame.transform.rotate(bullet_img, 270)
 
 
 # ======================Define Sprites===================
@@ -45,9 +53,9 @@ class Player(pygame.sprite.Sprite):
 
     def update(self):
         keystate = pygame.key.get_pressed()
-        if keystate[pygame.K_RIGHT]:
+        if keystate[pygame.K_d]:
             self.speed_x = 5
-        elif keystate[pygame.K_LEFT]:
+        elif keystate[pygame.K_a]:
             self.speed_x = -5
         else:
             self.speed_x = 0
@@ -71,23 +79,56 @@ class Mouse(pygame.sprite.Sprite):
         self.speed_y = 0
 
     def update(self):
-        self.rect.center = pygame.mouse.get_pos()
+        self.rect.x, self.rect.y = pygame.mouse.get_pos()
 
 
-# ===============Add all Colors=========
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-RED = (255, 0, 0)
-BLUE = (0, 0, 255)
-GREEN = (0, 255, 0)
-GRAY = (128, 128, 128)
+class Bullet(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface([20, 20])
+        self.rect = self.image.get_rect()
+        self.image = bullet_img
+        self.image.set_colorkey(WHITE)
+        self.speed_x = 0
+        self.speed_y = 0
+        self.last_update = pygame.time.get_ticks()
+        self.rect.center = kilroy.rect.center
+
+    def update(self):
+        now = pygame.time.get_ticks()
+        if self.rect.x > WIDTH or self.rect.y > HEIGHT or self.rect.y < 0 or self.rect.x < 0:
+            self.kill()
+            distance = 0
+        pygame.transform.rotate(screen,radians)
+
 
 # ===============Add all Sprites=========
 all_sprites_list = pygame.sprite.Group()
+
 kilroy = Player()
 all_sprites_list.add(kilroy)
+kilroy_group = pygame.sprite.Group()
+
 mouse = Mouse()
 all_sprites_list.add(mouse)
+mouse_group = pygame.sprite.Group()
+
+bullet = Bullet()
+bullet_group = pygame.sprite.Group()
+
+# ======================Define Variables=================
+# pygame.mouse.set_visible(0)
+
+stage_pos_x = 0
+
+gravity = -6.6
+
+x, y = bullet.rect.x, bullet.rect.y
+pmx, pmy = x, y
+
+dx, dy = 0, 0
+distance = 0
+speed = 14
 
 # =========================game loop=====================
 running = True
@@ -97,17 +138,32 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        if event.type == pygame.KEYDOWN and kilroy.rect.bottom >= 540:
-            if event.key == pygame.K_SPACE:
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_w and kilroy.rect.bottom >= 540:
                 kilroy.rect.y += kilroy.speed_y
+            if event.key == pygame.K_SPACE:
+                all_sprites_list.add(bullet)
+                mx, my = pygame.mouse.get_pos()
+                bullet.rect.center = kilroy.rect.center
+                radians = math.atan2(my - bullet.rect.y, mx - bullet.rect.x)
+                distance = math.hypot(mx - pmx, my - pmy) / speed
+                distance = int(distance)
+
+                dx = math.cos(radians) * speed
+                dy = math.sin(radians) * speed
+    if distance:
+        # distance -= 1
+        bullet.rect.x += dx
+        bullet.rect.y += dy
     kilroy.rect.y -= gravity
     if stage_pos_x <= -400:
         stage_pos_x = -400
-    elif kilroy.rect.x >= WIDTH / 2:
+    elif kilroy.rect.x >= WIDTH / 2 - 100:
         stage_pos_x -= kilroy.speed_x
-        kilroy.rect.x = WIDTH / 2
+        kilroy.rect.x = WIDTH / 2 - 100
     screen.blit(space_back, [stage_pos_x, 0])
     all_sprites_list.update()
+    bullet_group.update()
     all_sprites_list.draw(screen)
     pygame.display.flip()
 pygame.quit()
