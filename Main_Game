@@ -91,15 +91,14 @@ class Bullet(pygame.sprite.Sprite):
         self.image.set_colorkey(WHITE)
         self.speed_x = 0
         self.speed_y = 0
-        self.last_update = pygame.time.get_ticks()
         self.rect.center = kilroy.rect.center
 
     def update(self):
-        now = pygame.time.get_ticks()
+        if distance:
+            self.rect.x += dx
+            self.rect.y += dy
         if self.rect.x > WIDTH or self.rect.y > HEIGHT or self.rect.y < 0 or self.rect.x < 0:
             self.kill()
-            distance = 0
-        pygame.transform.rotate(screen,radians)
 
 
 # ===============Add all Sprites=========
@@ -148,13 +147,9 @@ while running:
                 radians = math.atan2(my - bullet.rect.y, mx - bullet.rect.x)
                 distance = math.hypot(mx - pmx, my - pmy) / speed
                 distance = int(distance)
-
                 dx = math.cos(radians) * speed
                 dy = math.sin(radians) * speed
-    if distance:
-        # distance -= 1
-        bullet.rect.x += dx
-        bullet.rect.y += dy
+
     kilroy.rect.y -= gravity
     if stage_pos_x <= -400:
         stage_pos_x = -400
