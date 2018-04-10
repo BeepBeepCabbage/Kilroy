@@ -89,6 +89,8 @@ class Player(pygame.sprite.Sprite):
         self.dir = "R"
         sprite_sheet = SpriteSheet("OpenGunnerHeroVer2.png")
         self.walk_frames_l = []
+        self.idle_r = []
+        self.idle_l = []
         self.walk_frames_r = []
         image = sprite_sheet.get_image(24, 315, 50, 50)
         self.walk_frames_r.append(image)
@@ -106,23 +108,30 @@ class Player(pygame.sprite.Sprite):
         self.walk_frames_r.append(image)
         image = sprite_sheet.get_image(381, 315, 50, 50)
         self.walk_frames_r.append(image)
-        # image = sprite_sheet.get_image(432, 315, 50, 50)
-        # self.walk_frames_r.append(image)
+        image = sprite_sheet.get_image(24, 143, 50, 50)
+        self.idle_r.append(image)
+        image = sprite_sheet.get_image(24, 200, 50, 50)
+        self.idle_l.append(image)
 
     def update(self):
         pos = self.rect.x + stage_pos_x
         print(pos)
         keystate = pygame.key.get_pressed()
         if keystate[pygame.K_d]:
-            self.speed_x = 5
+            self.speed_x = 7
             self.dir = "R"
             frame = (pos // 30) % len(self.walk_frames_r)
+
             self.image = self.walk_frames_r[frame]
         elif keystate[pygame.K_a]:
-            self.speed_x = -5
+            self.speed_x = -7
+            frame = (pos // 30) % len(self.walk_frames_r)
+
+            self.image = self.walk_frames_r[frame]
             self.dir = "L"
         else:
             self.speed_x = 0
+
         self.rect.x += self.speed_x
         if self.rect.bottom >= 540:
             self.rect.bottom = 540
@@ -189,7 +198,7 @@ for i in range(36):
 # ======================Define Variables=================
 
 stage_pos_x = 0
-
+accerlaction = -.4
 gravity = -6
 x, y = bullet.rect.x, bullet.rect.y
 pmx, pmy = x, y
@@ -203,6 +212,9 @@ running = True
 while running:
     collide = pygame.sprite.spritecollide(kilroy, plat_groupp, None)
     if collide:
+        gravity = 0
+        # accerlaction = 0
+        # kilroy.rect.y -= 6
         kilroy.rect.bottom = platfromer.rect.top
     now = pygame.time.get_ticks()
     screen.fill(BLACK)
@@ -211,8 +223,8 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_w and collide:
-                kilroy.rect.y += kilroy.speed_y
+            if event.key == pygame.K_w :
+                gravity = 8
             if event.key == pygame.K_SPACE and now - last_update > 900:
                 last_update = pygame.time.get_ticks()
                 all_sprites_list.add(bullet)
@@ -231,6 +243,7 @@ while running:
         # pla mt_x_2 -= kilroy.speed_x
         kilroy.rect.x = WIDTH / 2 - 100
     kilroy.rect.y -= gravity
+    gravity = gravity + accerlaction
     screen.blit(space_back, [stage_pos_x, 0])
     all_sprites_list.update()
     bullet_group.update()
