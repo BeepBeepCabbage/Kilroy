@@ -27,7 +27,7 @@ GRAY = (128, 128, 128)
 PURPLE = (77, 75, 118)
 
 # =========================Sprites Images=====================
-img_dir = path.join(path.dirname(__file__), 'D:')
+img_dir = path.join(path.dirname(__file__), 'H:\\Images')
 
 space_back = pygame.image.load(path.join(img_dir, "full-background.png")).convert()
 space_back = pygame.transform.scale(space_back, [1200, HEIGHT])
@@ -96,8 +96,10 @@ class Player(pygame.sprite.Sprite):
         self.bottom_r = []
         self.mid_aim_l = []
         self.top_aim_l = []
+        self.top_r = []
         self.bottom_aim_mid_l = []
         self.bottom_aim_l = []
+        self.bottom_l = []
 
         image = sprite_sheet.get_image(24, 315, 50, 50)
         self.walk_frames_r.append(image)
@@ -335,18 +337,30 @@ class Player(pygame.sprite.Sprite):
             if self.last_loc <= self.rect.x:
                 self.last_loc = self.rect.x
                 self.frame += 1
-            if self.frame >= 8:
-                self.frame = 0
-            self.image = self.walk_frames_r[self.frame]
+                if self.frame >= 8:
+                    self.frame = 0
+                if degrees_2 == 0:
+                    self.image = self.walk_frames_r[self.frame]
+                if degrees_2 > 0 and degrees_2 < 45:
+                    self.image = self.bottom_aim_mid_r[self.frame]
+                if degrees_2 > 44 and degrees_2 < 90:
+                    self.image = self.bottom_aim_r[self.frame]
+
+
         elif keystate[pygame.K_a]:
             self.speed_x = -7
             self.dir = "L"
             if self.last_loc >= self.rect.x:
                 self.last_loc = self.rect.x
                 self.frame += 1
-            if self.frame >= 8:
-                self.frame = 0
-            self.image = self.walk_frames_l[self.frame]
+                if self.frame >= 8:
+                    self.frame = 0
+                if degrees_2 == 180:
+                    self.image = self.walk_frames_l[self.frame]
+                if degrees_2 > 89 and degrees_2 < 135:
+                    self.image = self.bottom_aim_l[self.frame]
+                if degrees_2 > 134 and degrees_2 < 180:
+                    self.image = self.bottom_aim_mid_l[self.frame]
         else:
             self.frame = 0
             self.speed_x = 0
@@ -360,8 +374,8 @@ class Player(pygame.sprite.Sprite):
         if self.rect.left <= 0:
             self.rect.left = 0
             self.speed_x = 0
-        if self.rect.right >= WIDTH:
-            self.rect.right = WIDTH
+        if self.rect.right >= WIDTH - 25:
+            self.rect.right = WIDTH - 25
             self.speed_x = 0
 
 
@@ -392,6 +406,9 @@ class Platform(pygame.sprite.Sprite):
         # self.image.fill(BLACK)
         self.rect.x = plat_x
         self.rect.y = plat_y
+
+    def update(self):
+        self.rect.x -= kilroy.speed_x
 
 
 # ===============Add all Sprites=========
@@ -428,6 +445,7 @@ last_update = pygame.time.get_ticks()
 # =========================game loop=====================
 running = True
 while running:
+    mouse_x, mouse_y = pygame.mouse.get_pos()
     collide = pygame.sprite.spritecollide(kilroy, plat_groupp, None)
     if collide:
         gravity = 0
@@ -436,6 +454,9 @@ while running:
     now = pygame.time.get_ticks()
     screen.fill(BLACK)
     clock.tick(FPS)
+    radians_2 = math.atan2(mouse_y - kilroy.rect.y, mouse_x - kilroy.rect.x)
+    degrees_2 = 180 * radians_2 / math.pi
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -455,14 +476,12 @@ while running:
                 dx = math.cos(radians) * speed
                 dy = math.sin(radians) * speed
                 degrees = 180 * radians / math.pi
-                print(degrees)
+                print(degrees_2)
     if stage_pos_x <= -400:
         stage_pos_x = -400
     elif kilroy.rect.x >= WIDTH / 2 - 100:
         stage_pos_x -= kilroy.speed_x
-        platfromer.rect.x -= kilroy.speed_x
-
-        # pla mt_x_2 -= kilroy.speed_x
+        plat_x_2 -= kilroy.speed_x
         kilroy.rect.x = WIDTH / 2 - 100
     kilroy.rect.y -= gravity
     gravity = gravity + accerlaction
