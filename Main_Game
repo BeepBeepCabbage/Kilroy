@@ -27,7 +27,7 @@ GRAY = (128, 128, 128)
 PURPLE = (77, 75, 118)
 
 # =========================Sprites Images=====================
-img_dir = path.join(path.dirname(__file__), 'C:\\Users\\Dank Memes\\Downloads\\Game_Img')
+img_dir = path.join(path.dirname(__file__), 'H:\\Images')
 
 space_back = pygame.image.load(path.join(img_dir, "full-background.png")).convert()
 space_back = pygame.transform.scale(space_back, [1200, HEIGHT])
@@ -100,7 +100,7 @@ class Player(pygame.sprite.Sprite):
         self.bottom_aim_mid_l = []
         self.bottom_aim_l = []
         self.bottom_l = []
-
+        self.walk_frames_l_aim_r = []
         image = sprite_sheet.get_image(24, 315, 50, 50)
         self.walk_frames_r.append(image)
         image = sprite_sheet.get_image(75, 315, 50, 50)
@@ -328,11 +328,12 @@ class Player(pygame.sprite.Sprite):
         self.frame = 0
         self.image = self.idle_r[self.frame]
 
+        self.walk_frames_l_aim_r = self.walk_frames_r.reverse()
     def update(self):
         keystate = pygame.key.get_pressed()
         if keystate[pygame.K_d]:
 
-            self.speed_x = 0
+            self.speed_x = 7
             self.dir = "R"
             if self.last_loc <= self.rect.x:
                 self.last_loc = self.rect.x
@@ -347,20 +348,28 @@ class Player(pygame.sprite.Sprite):
                     self.image = self.bottom_aim_r[self.frame]
 
         elif keystate[pygame.K_a]:
-            self.speed_x = 0
+            self.speed_x = -7
             self.dir = "L"
             if self.last_loc >= self.rect.x:
                 self.last_loc = self.rect.x
-                self.frame += 1
-                if self.frame >= 8:
-                    self.frame = 0
                 if degrees_2 > 165.4 and degrees_2 < -165.4:
                     self.image = self.walk_frames_l[self.frame]
+                    self.frame += 1
+
                 if degrees_2 > 105.5 and degrees_2 < 135:
                     self.image = self.bottom_aim_l[self.frame]
+                    self.frame += 1
+
                 if degrees_2 > 135 and degrees_2 < 165.4:
                     self.image = self.bottom_aim_mid_l[self.frame]
+                    self.frame += 1
 
+                if degrees_2 < 14.6 and degrees_2 > -14.6:
+                    self.image = self.walk_frames_r[self.frame]
+                    self.frame += 1
+
+                if self.frame >= 8:
+                    self.frame = 0
         else:
             self.frame = 0
             self.speed_x = 0
