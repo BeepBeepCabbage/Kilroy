@@ -75,7 +75,7 @@ class Player(pygame.sprite.Sprite):
 
         self.rect = self.image.get_rect()
         # self.image.set_colorkey(WHITE)
-        self.rect.x = 400
+        self.rect.x = 100
         self.rect.y = 100
         self.speed_x = 0
         self.speed_y = -200
@@ -101,6 +101,19 @@ class Player(pygame.sprite.Sprite):
         self.bottom_aim_l = []
         self.bottom_l = []
         self.walk_frames_l_aim_r = []
+
+        self.idle_mid_aim_r = []
+        self.idle_top_aim_r = []
+        self.idle_top_r = []
+        self.idle_mid_aim_l = []
+        self.idle_top_aim_l = []
+        self.idle_top_l = []
+        self.idle_bottom_mid_r = []
+        self.idle_bottom_aim_r = []
+        self.idle_bottom_r = []
+        self.idle_bottom_mid_l = []
+        self.idle_bottom_aim_l = []
+        self.idle_bottom_l = []
 
         image = sprite_sheet.get_image(24, 315, 50, 50)
         self.walk_frames_r.append(image)
@@ -321,6 +334,48 @@ class Player(pygame.sprite.Sprite):
         image = sprite_sheet.get_image(202, 143, 50, 50)
         self.jump_frame_r.append(image)
 
+        image = sprite_sheet.get_image(25, 676, 50, 57)
+        self.idle_mid_aim_r.append(image)
+
+        image = sprite_sheet.get_image(81, 676, 50, 57)
+        self.idle_top_aim_r.append(image)
+
+        image = sprite_sheet.get_image(137, 676, 50, 57)
+        self.idle_top_r.append(image)
+
+        image = sprite_sheet.get_image(25, 739, 50, 57)
+        self.idle_bottom_mid_r.append(image)
+
+        image = sprite_sheet.get_image(81, 739, 50, 57)
+        self.idle_bottom_aim_r.append(image)
+
+        image = sprite_sheet.get_image(137, 739, 50, 57)
+        self.idle_bottom_r.append(image)
+
+        image = sprite_sheet.get_image(25, 676, 50, 57)
+        image = pygame.transform.flip(image, True, False)
+        self.idle_mid_aim_l.append(image)
+
+        image = sprite_sheet.get_image(81, 676, 50, 57)
+        image = pygame.transform.flip(image, True, False)
+        self.idle_top_aim_l.append(image)
+
+        image = sprite_sheet.get_image(137, 676, 50, 57)
+        image = pygame.transform.flip(image, True, False)
+        self.idle_top_l.append(image)
+
+        image = sprite_sheet.get_image(25, 739, 50, 57)
+        image = pygame.transform.flip(image, True, False)
+        self.idle_bottom_mid_l.append(image)
+
+        image = sprite_sheet.get_image(81, 739, 50, 57)
+        image = pygame.transform.flip(image, True, False)
+        self.idle_bottom_aim_l.append(image)
+
+        image = sprite_sheet.get_image(137, 739, 50, 57)
+        image = pygame.transform.flip(image, True, False)
+        self.idle_bottom_l.append(image)
+
         image = sprite_sheet.get_image(202, 143, 50, 50)
         image = pygame.transform.flip(image, True, False)
         self.jump_frame_l.append(image)
@@ -329,44 +384,13 @@ class Player(pygame.sprite.Sprite):
         self.frame = 0
         self.image = self.idle_r[self.frame]
 
-        self.walk_frames_r_oppiste = self.walk_frames_r
-        self.walk_frames_r_oppiste.reverse()
-        self.bottom_aim_mid_r_oppisite = self.bottom_aim_mid_r
-        self.bottom_aim_mid_r_oppisite.reverse()
-        self.bottom_aim_r_oppisite = self.bottom_aim_r
-        self.bottom_aim_r_oppisite.reverse()
-        self.walk_frames_l_oppisite = self.walk_frames_l
-        self.walk_frames_r_oppiste.reverse()
-        self.top_aim_l_oppisite = self.top_aim_l
-        self.top_aim_l_oppisite.reverse()
-        self.mid_aim_l_oppisite = self.mid_aim_l
-        self.top_aim_l_oppisite.reverse()
-
     def update(self):
         keystate = pygame.key.get_pressed()
         if keystate[pygame.K_d]:
-            self.speed_x = 0
+            self.speed_x = 7
             if self.last_loc <= self.rect.x:
                 self.last_loc = self.rect.x
-                if degrees_2 > 105.5 and degrees_2 < 135:
-                    self.image = self.bottom_aim_l[self.frame]
-                    self.frame += 1
-                    self.dir = "L"
-                    if self.frame >= 8:
-                        self.frame = 0
-                if degrees_2 < -46 and degrees_2 > -74.5:
-                    self.image = self.top_aim_r[self.frame]
-                    self.frame += 1
-                    self.dir = 'R'
-                    if self.frame >= 8:
-                        self.frame = 0
-                if degrees_2 > -46 and degrees_2 < - 14.6:
-                    self.image = self.mid_aim_r[self.frame]
-                    self.dir = 'R'
-                    self.frame += 1
-                    if self.frame >= 8:
-                        self.frame = 0
-                if degrees_2 < 14.6 or degrees_2 > -14.6:
+                if degrees_2 < 14.6 and degrees_2 > -14.6:
                     self.image = self.walk_frames_r[self.frame]
                     self.dir = 'R'
                     self.frame += 1
@@ -380,6 +404,18 @@ class Player(pygame.sprite.Sprite):
                         self.frame = 0
                 if degrees_2 > 45 and degrees_2 < 74.5:
                     self.image = self.bottom_aim_r[self.frame]
+                    self.dir = 'R'
+                    self.frame += 1
+                    if self.frame >= 8:
+                        self.frame = 0
+                if degrees_2 < -46 and degrees_2 > -74.5:
+                    self.image = self.top_aim_r[self.frame]
+                    self.frame += 1
+                    self.dir = 'R'
+                    if self.frame >= 8:
+                        self.frame = 0
+                if degrees_2 > -46 and degrees_2 < - 14.6:
+                    self.image = self.mid_aim_r[self.frame]
                     self.dir = 'R'
                     self.frame += 1
                     if self.frame >= 8:
@@ -402,10 +438,22 @@ class Player(pygame.sprite.Sprite):
                     self.dir = "L"
                     if self.frame >= 8:
                         self.frame = 0
+                if degrees_2 > 105.5 and degrees_2 < 135:
+                    self.image = self.bottom_aim_l[self.frame]
+                    self.frame += 1
+                    self.dir = "L"
+                    if self.frame >= 8:
+                        self.frame = 0
 
+                if degrees_2 > 135 and degrees_2 < 165.4:
+                    self.image = self.bottom_aim_mid_l[self.frame]
+                    self.frame += 1
+                    self.dir = "L"
+                    if self.frame >= 8:
+                        self.frame = 0
 
         elif keystate[pygame.K_a]:
-            self.speed_x = 0
+            self.speed_x = -7
             if self.last_loc >= self.rect.x:
                 self.last_loc = self.rect.x
                 if degrees_2 < 14.6 and degrees_2 > -14.6:
@@ -473,10 +521,30 @@ class Player(pygame.sprite.Sprite):
         else:
             self.frame = 0
             self.speed_x = 0
-            if self.dir == "R":
-                self.image = self.idle_r[self.frame]
-            if self.dir == "L":
+            if degrees_2 < 14.6 and degrees_2 > -14.6:
+               self.image = self.idle_r[self.frame]
+            if degrees_2 > 14.5 and degrees_2 < 46:
+                self.image = self.idle_bottom_mid_r[self.frame]
+            if degrees_2 > 45 and degrees_2 < 74.5:
+                self.image = self.idle_bottom_aim_r[self.frame]
+            if degrees_2 < -46 and degrees_2 > -74.5:
+                self.image = self.idle_mid_aim_r[self.frame]
+            if degrees_2 > -46 and degrees_2 < - 14.6:
+                self.image = self.idle_mid_aim_r[self.frame]
+            if degrees_2 > 165.4 or degrees_2 < -165.4:
                 self.image = self.idle_l[self.frame]
+            if degrees_2 > -135 and degrees_2 < -105.5:
+               self.image = self.idle_top_aim_l[self.frame]
+            if degrees_2 > -165.4 and degrees_2 < -135:
+                self.image = self.idle_mid_aim_l[self.frame]
+            if degrees_2 > 105.5 and degrees_2 < 135:
+                self.image = self.idle_bottom_aim_l[self.frame]
+            if degrees_2 > 135 and degrees_2 < 165.4:
+               self.image = self.idle_bottom_mid_l[self.frame]
+            # if self.dir == "R":
+            #     self.image = self.idle_r[self.frame]
+            # if self.dir == "L":
+            #     self.image = self.idle_l[self.frame]
         self.rect.x += self.speed_x
         if self.rect.bottom >= 540:
             self.rect.bottom = 540
@@ -585,7 +653,6 @@ while running:
                 dx = math.cos(radians) * speed
                 dy = math.sin(radians) * speed
                 degrees = 180 * radians / math.pi
-                print(degrees_2)
     if stage_pos_x <= -400:
         stage_pos_x = -400
     elif kilroy.rect.x >= WIDTH / 2 - 100:
