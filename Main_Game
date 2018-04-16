@@ -157,7 +157,7 @@ class Player(pygame.sprite.Sprite):
         image = pygame.transform.flip(image, True, False)
         self.walk_frames_l.append(image)
 
-        image = sprite_sheet.get_image(25, 863, 50, 57)
+        image = sprite_sheet.get_image(25, 863, 50, 50)
         self.mid_aim_r.append(image)
         image = sprite_sheet.get_image(76, 863, 50, 50)
         self.mid_aim_r.append(image)
@@ -380,20 +380,6 @@ class Player(pygame.sprite.Sprite):
         image = pygame.transform.flip(image, True, False)
         self.jump_frame_l.append(image)
 
-        # image = sprite_sheet.get_image(137, 676, 50, 57)
-        # self.idle_top_r.append(image)
-        #
-        # image = sprite_sheet.get_image(137, 676, 50, 57)
-        # image = pygame.transform.flip(image, True, False)
-        # self.idle_top_l.append(image)
-
-        # image = sprite_sheet.get_image(137, 739, 50, 57)
-        # self.idle_bottom_r.append(image)
-        #
-        # image = sprite_sheet.get_image(137, 739, 50, 57)
-        # image = pygame.transform.flip(image, True, False)
-        # self.idle_bottom_l.append(image)
-
         self.last_loc = self.rect.x
         self.frame = 0
         self.image = self.idle_r[self.frame]
@@ -465,22 +451,7 @@ class Player(pygame.sprite.Sprite):
                     self.dir = "L"
                     if self.frame >= 8:
                         self.frame = 0
-                # if degrees_2 > -90 and degrees_2 < -74.6:
-                #     self.frame = 0
-                #     self.speed_x = 0
-                #     self.image = self.idle_top_r[self.frame]
-                # if degrees_2 < 90 and degrees_2 > 74.5:
-                #     self.frame = 0
-                #     self.speed_x = 0
-                #     self.image = self.idle_bottom_l[self.frame]
-                # if degrees_2 > 90 and degrees_2 < 105.5:
-                #     self.frame = 0
-                #     self.speed_x = 0
-                #     self.image = self.idle_bottom_r[self.frame]
-                # if degrees_2 < -90 and degrees_2 > -105.5:
-                #     self.frame = 0
-                #     self.speed_x = 0
-                #     self.image = self.idle_top_l[self.frame]
+
         elif keystate[pygame.K_a]:
             self.speed_x = -7
             if self.last_loc >= self.rect.x:
@@ -545,22 +516,6 @@ class Player(pygame.sprite.Sprite):
                     self.dir = "L"
                     if self.frame >= 8:
                         self.frame = 0
-                # if degrees_2 > -90 and degrees_2 < -74.6:
-                #     self.frame = 0
-                #     self.speed_x = 0
-                #     self.image = self.idle_top_r[self.frame]
-                # if degrees_2 < 90 and degrees_2 > 74.5:
-                #     self.frame = 0
-                #     self.speed_x = 0
-                #     self.image = self.idle_bottom_l[self.frame]
-                # if degrees_2 > 90 and degrees_2 < 105.5:
-                #     self.frame = 0
-                #     self.speed_x = 0
-                #     self.image = self.idle_bottom_r[self.frame]
-                # if degrees_2 < -90 and degrees_2 > -105.5:
-                #     self.frame = 0
-                #     self.speed_x = 0
-                #     self.image = self.idle_top_l[self.frame]
         else:
             self.frame = 0
             self.speed_x = 0
@@ -584,14 +539,6 @@ class Player(pygame.sprite.Sprite):
                 self.image = self.idle_bottom_aim_l[self.frame]
             if degrees_2 > 135 and degrees_2 < 165.4:
                 self.image = self.idle_bottom_mid_l[self.frame]
-            # if degrees_2 > -90 and degrees_2 < -74.6:
-            #     self.image = self.idle_top_r[self.frame]
-            # if degrees_2 < 90 and degrees_2 > 74.5:
-            #     self.image = self.idle_bottom_l[self.frame]
-            # if degrees_2 > 90 and degrees_2 < 105.5:
-            #     self.image = self.idle_bottom_r[self.frame]
-            # if degrees_2 < -90 and degrees_2 > -105.5:
-            #     self.image = self.idle_top_l[self.frame]
         self.rect.x += self.speed_x
         if self.rect.bottom >= 540:
             self.rect.bottom = 540
@@ -666,7 +613,7 @@ dx, dy = 0, 0
 distance = 0
 speed = 14
 last_update = pygame.time.get_ticks()
-# =========================game loop=====================
+# =============== ==========game loop=====================
 running = True
 while running:
     mouse_x, mouse_y = pygame.mouse.get_pos()
@@ -674,6 +621,8 @@ while running:
     if collide:
         gravity = 0
         accerlaction = 0
+        kilroy.rect.y -= gravity
+        gravity = gravity + accerlaction
         kilroy.rect.y = platfromer.rect.top - 50
     now = pygame.time.get_ticks()
     screen.fill(BLACK)
@@ -690,20 +639,36 @@ while running:
                 accerlaction = -.4
 
             if event.key == pygame.K_SPACE and now - last_update > 10:
-                if degrees_2 < 60 or - degrees_2 < -135:
-                    print(degrees_2)
+                if degrees_2 < 70 and degrees_2 > -75:
                     last_update = pygame.time.get_ticks()
                     all_sprites_list.add(bullet)
-                    mx, my = pygame.mouse.get_pos()
-                    bullet.rect.center = kilroy.rect.center
+                    print(kilroy.rect.center)
+                    print(pygame.mouse.get_pos())
+                    if degrees_2 < -46 and degrees_2 > -90:
+                        bullet.rect.center = kilroy.rect.center
+                        bullet.rect.x += 45
+                        bullet.rect.y -= 18
+                        mx, my = bullet.rect.x + 100, bullet.rect.y - 100
+
+                    if degrees_2 > -46 and degrees_2 < - 14.6:
+                        bullet.rect.center = kilroy.rect.center
+                        bullet.rect.x += 57
+                        bullet.rect.y -= 10
+                        mx, my = bullet.rect.x + 100, bullet.rect.y - 50
+                    if degrees_2 < 14.6 and degrees_2 > -14.6:
+                        bullet.rect.center = kilroy.rect.center
+                        bullet.rect.x += 63
+                        bullet.rect.y += 7
+                        mx, my = bullet.rect.x + 100, bullet.rect.y
                     radians = math.atan2(my - bullet.rect.y, mx - bullet.rect.x)
                     distance = math.hypot(mx - pmx, my - pmy) / speed
                     distance = int(distance)
                     dx = math.cos(radians) * speed
                     dy = math.sin(radians) * speed
                     degrees = 180 * radians / math.pi
-                elif  degrees_2 > - 45 or degrees_2 > 106:
-                    print(degrees_2)
+                elif degrees_2 < - 100 or degrees_2 > 95:
+                    print(pygame.mouse.get_pos())
+                    print(kilroy.rect.center)
                     last_update = pygame.time.get_ticks()
                     all_sprites_list.add(bullet)
                     mx, my = pygame.mouse.get_pos()
