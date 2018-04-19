@@ -26,7 +26,7 @@ GRAY = (128, 128, 128)
 PURPLE = (77, 75, 118)
 
 # =========================Sprites Images=====================
-img_dir = path.join(path.dirname(__file__), 'H:')
+img_dir = path.join(path.dirname(__file__), 'D:')
 
 space_back = pygame.image.load(path.join(img_dir, "full-background.png")).convert()
 space_back = pygame.transform.scale(space_back, [1200, HEIGHT])
@@ -70,8 +70,9 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         # self.image.fill(BLACK)
-        self.image = pygame.Surface([50, 59])
-
+        self.image = pygame.Surface([40, 50])
+        self.width = 50
+        self.height = 50
         self.rect = self.image.get_rect()
         # self.image.set_colorkey(WHITE)
         self.rect.x = 100
@@ -387,15 +388,23 @@ class Player(pygame.sprite.Sprite):
         self.image = self.idle_r[self.frame]
 
     def update(self):
-        collide = pygame.sprite.spritecollide(self, plat_groupp, False)
-        if collide:
-            self.rect. = platfromer
-        if self.gravity <= -9:
-            self.gravity = -9
-        self.rect.y -= self.gravity
-        self.gravity -= self.acc
         keystate = pygame.key.get_pressed()
-        if keystate[pygame.K_d]:
+        collide = pygame.sprite.spritecollide(self, plat_groupp, False)
+        if self.gravity < 0:
+            if collide:
+                self.rect.bottom = platfromer.rect.top
+                self.gravity = 0
+                self.acc = 0
+
+        if self.gravity <= -30:
+            self.gravity = -30
+
+        self.rect.y -= self.gravity
+        self.gravity += self.acc
+        if keystate[pygame.K_w]:
+            self.gravity = 6
+            self.acc = -.4
+        elif keystate[pygame.K_d]:
             self.speed_x = 7
             if self.last_loc <= self.rect.x:
                 self.last_loc = self.rect.x
@@ -525,6 +534,7 @@ class Player(pygame.sprite.Sprite):
                     self.dir = "L"
                     if self.frame >= 8:
                         self.frame = 0
+
         else:
             self.frame = 0
             self.speed_x = 0
@@ -558,16 +568,12 @@ class Player(pygame.sprite.Sprite):
             self.rect.right = WIDTH - 25
             self.speed_x = 0
 
-        elif keystate[pygame.K_w]:
-            self.gravity = 8
-
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, bullet_x, bullet_y):
 
         pygame.sprite.Sprite.__init__(self)
         self.speed = 1
-        # print("bep")
         self.mouse_x, self.mouse_y = pygame.mouse.get_pos()
         self.radians_2 = math.atan2(self.mouse_y - kilroy.rect.y, self.mouse_x - kilroy.rect.x)
         self.degrees_2 = 180 * self.radians_2 / math.pi
