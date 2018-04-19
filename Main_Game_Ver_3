@@ -1,0 +1,753 @@
+import math
+from os import path
+
+import pygame
+
+# from all_classes import *
+
+WIDTH = 800
+HEIGHT = 600
+FPS = 30
+# ===============initialize pygame and create window=========
+pygame.init()
+pygame.mixer.init()
+pygame.display.init()
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Kilroy")
+clock = pygame.time.Clock()
+
+# ===========Add all Colors=========
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+BLUE = (0, 0, 255)
+GREEN = (0, 255, 0)
+GRAY = (128, 128, 128)
+PURPLE = (77, 75, 118)
+
+# =========================Sprites Images=====================
+img_dir = path.join(path.dirname(__file__), 'H:')
+
+space_back = pygame.image.load(path.join(img_dir, "full-background.png")).convert()
+space_back = pygame.transform.scale(space_back, [1200, HEIGHT])
+
+floor_tile_img = pygame.image.load(path.join(img_dir, "game_floor_tile.png")).convert()
+hero_spritesheet = pygame.image.load(path.join(img_dir, "OpenGunnerHeroVer2.png")).convert()
+
+bullet_img = pygame.image.load(path.join(img_dir, "bullet.png")).convert()
+bullet_img = pygame.transform.scale(bullet_img, [10, 10])
+
+
+# ======================Define Sprites===================
+class SpriteSheet(object):
+    """ Class used to grab images out of a sprite sheet. """
+
+    def __init__(self, file_name):
+        """ Constructor. Pass in the file name of the sprite sheet. """
+
+        # Load the sprite sheet.
+        self.sprite_sheet = pygame.image.load(path.join(img_dir, file_name)).convert()
+
+    def get_image(self, x, y, width, height):
+        """ Grab a single image out of a larger spritesheet
+            Pass in the x, y location of the sprite
+            and the width and height of the sprite. """
+
+        # Create a new blank image
+        image = pygame.Surface([width, height]).convert()
+
+        # Copy the sprite from the large sheet onto the smaller image
+        image.blit(self.sprite_sheet, (0, 0), (x, y, width, height))
+
+        # Assuming black works as the transparent color
+        image.set_colorkey(PURPLE)
+
+        # Return the image
+        return image
+
+
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        # self.image.fill(BLACK)
+        self.image = pygame.Surface([50, 59])
+
+        self.rect = self.image.get_rect()
+        # self.image.set_colorkey(WHITE)
+        self.rect.x = 100
+        self.rect.y = 100
+        self.speed_x = 0
+        self.speed_y = -200
+        self.dir = "R"
+        self.gravity = -6
+        self.acc = -.4
+
+        sprite_sheet = SpriteSheet("OpenGunnerHeroVer2.png")
+
+        self.walk_frames_l = []
+        self.idle_r = []
+        self.idle_l = []
+        self.walk_frames_r = []
+        self.jump_frame_r = []
+        self.jump_frame_l = []
+        self.mid_aim_r = []
+        self.top_aim_r = []
+        self.top_r = []
+        self.bottom_aim_mid_r = []
+        self.bottom_aim_r = []
+        self.bottom_r = []
+        self.mid_aim_l = []
+        self.top_aim_l = []
+        self.top_r = []
+        self.bottom_aim_mid_l = []
+        self.bottom_aim_l = []
+        self.bottom_l = []
+        self.walk_frames_l_aim_r = []
+
+        self.idle_mid_aim_r = []
+        self.idle_top_aim_r = []
+        self.idle_top_r = []
+        self.idle_mid_aim_l = []
+        self.idle_top_aim_l = []
+        self.idle_top_l = []
+        self.idle_bottom_mid_r = []
+        self.idle_bottom_aim_r = []
+        self.idle_bottom_r = []
+        self.idle_bottom_mid_l = []
+        self.idle_bottom_aim_l = []
+        self.idle_bottom_l = []
+
+        image = sprite_sheet.get_image(24, 315, 50, 50)
+        self.walk_frames_r.append(image)
+        image = sprite_sheet.get_image(75, 315, 50, 50)
+        self.walk_frames_r.append(image)
+        image = sprite_sheet.get_image(126, 315, 50, 50)
+        self.walk_frames_r.append(image)
+        image = sprite_sheet.get_image(177, 315, 50, 50)
+        self.walk_frames_r.append(image)
+        image = sprite_sheet.get_image(228, 315, 50, 50)
+        self.walk_frames_r.append(image)
+        image = sprite_sheet.get_image(279, 315, 50, 50)
+        self.walk_frames_r.append(image)
+        image = sprite_sheet.get_image(330, 315, 50, 50)
+        self.walk_frames_r.append(image)
+        image = sprite_sheet.get_image(381, 315, 50, 50)
+        self.walk_frames_r.append(image)
+
+        image = sprite_sheet.get_image(24, 315, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.walk_frames_l.append(image)
+        image = sprite_sheet.get_image(75, 315, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.walk_frames_l.append(image)
+        image = sprite_sheet.get_image(126, 315, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.walk_frames_l.append(image)
+        image = sprite_sheet.get_image(177, 315, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.walk_frames_l.append(image)
+        image = sprite_sheet.get_image(228, 315, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.walk_frames_l.append(image)
+        image = sprite_sheet.get_image(279, 315, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.walk_frames_l.append(image)
+        image = sprite_sheet.get_image(330, 315, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.walk_frames_l.append(image)
+        image = sprite_sheet.get_image(381, 315, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.walk_frames_l.append(image)
+
+        image = sprite_sheet.get_image(25, 863, 50, 50)
+        self.mid_aim_r.append(image)
+        image = sprite_sheet.get_image(76, 863, 50, 50)
+        self.mid_aim_r.append(image)
+        image = sprite_sheet.get_image(127, 863, 50, 50)
+        self.mid_aim_r.append(image)
+        image = sprite_sheet.get_image(178, 863, 50, 50)
+        self.mid_aim_r.append(image)
+        image = sprite_sheet.get_image(229, 863, 50, 50)
+        self.mid_aim_r.append(image)
+        image = sprite_sheet.get_image(280, 863, 50, 50)
+        self.mid_aim_r.append(image)
+        image = sprite_sheet.get_image(331, 863, 50, 50)
+        self.mid_aim_r.append(image)
+        image = sprite_sheet.get_image(382, 863, 50, 50)
+        self.mid_aim_r.append(image)
+
+        image = sprite_sheet.get_image(25, 863, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.mid_aim_l.append(image)
+        image = sprite_sheet.get_image(76, 863, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.mid_aim_l.append(image)
+        image = sprite_sheet.get_image(127, 863, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.mid_aim_l.append(image)
+        image = sprite_sheet.get_image(178, 863, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.mid_aim_l.append(image)
+        image = sprite_sheet.get_image(229, 863, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.mid_aim_l.append(image)
+        image = sprite_sheet.get_image(280, 863, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.mid_aim_l.append(image)
+        image = sprite_sheet.get_image(331, 863, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.mid_aim_l.append(image)
+        image = sprite_sheet.get_image(382, 863, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.mid_aim_l.append(image)
+
+        image = sprite_sheet.get_image(25, 932, 50, 50)
+        self.top_aim_r.append(image)
+        image = sprite_sheet.get_image(76, 932, 50, 50)
+        self.top_aim_r.append(image)
+        image = sprite_sheet.get_image(127, 932, 50, 50)
+        self.top_aim_r.append(image)
+        image = sprite_sheet.get_image(178, 932, 50, 50)
+        self.top_aim_r.append(image)
+        image = sprite_sheet.get_image(229, 932, 50, 50)
+        self.top_aim_r.append(image)
+        image = sprite_sheet.get_image(280, 932, 50, 50)
+        self.top_aim_r.append(image)
+        image = sprite_sheet.get_image(331, 932, 50, 50)
+        self.top_aim_r.append(image)
+        image = sprite_sheet.get_image(382, 932, 50, 50)
+        self.top_aim_r.append(image)
+
+        image = sprite_sheet.get_image(25, 932, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.top_aim_l.append(image)
+        image = sprite_sheet.get_image(76, 932, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.top_aim_l.append(image)
+        image = sprite_sheet.get_image(127, 932, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.top_aim_l.append(image)
+        image = sprite_sheet.get_image(178, 932, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.top_aim_l.append(image)
+        image = sprite_sheet.get_image(229, 932, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.top_aim_l.append(image)
+        image = sprite_sheet.get_image(280, 932, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.top_aim_l.append(image)
+        image = sprite_sheet.get_image(331, 932, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.top_aim_l.append(image)
+        image = sprite_sheet.get_image(382, 932, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.top_aim_l.append(image)
+
+        image = sprite_sheet.get_image(454, 863, 50, 50)
+        self.bottom_aim_mid_r.append(image)
+        image = sprite_sheet.get_image(505, 863, 50, 50)
+        self.bottom_aim_mid_r.append(image)
+        image = sprite_sheet.get_image(556, 863, 50, 50)
+        self.bottom_aim_mid_r.append(image)
+        image = sprite_sheet.get_image(607, 863, 50, 50)
+        self.bottom_aim_mid_r.append(image)
+        image = sprite_sheet.get_image(658, 863, 50, 50)
+        self.bottom_aim_mid_r.append(image)
+        image = sprite_sheet.get_image(709, 863, 50, 50)
+        self.bottom_aim_mid_r.append(image)
+        image = sprite_sheet.get_image(760, 863, 50, 50)
+        self.bottom_aim_mid_r.append(image)
+        image = sprite_sheet.get_image(811, 863, 50, 50)
+        self.bottom_aim_mid_r.append(image)
+
+        image = sprite_sheet.get_image(454, 863, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.bottom_aim_mid_l.append(image)
+        image = sprite_sheet.get_image(505, 863, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.bottom_aim_mid_l.append(image)
+        image = sprite_sheet.get_image(556, 863, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.bottom_aim_mid_l.append(image)
+        image = sprite_sheet.get_image(607, 863, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.bottom_aim_mid_l.append(image)
+        image = sprite_sheet.get_image(658, 863, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.bottom_aim_mid_l.append(image)
+        image = sprite_sheet.get_image(709, 863, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.bottom_aim_mid_l.append(image)
+        image = sprite_sheet.get_image(760, 863, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.bottom_aim_mid_l.append(image)
+        image = sprite_sheet.get_image(811, 863, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.bottom_aim_mid_l.append(image)
+
+        image = sprite_sheet.get_image(454, 932, 50, 50)
+        self.bottom_aim_r.append(image)
+        image = sprite_sheet.get_image(505, 932, 50, 50)
+        self.bottom_aim_r.append(image)
+        image = sprite_sheet.get_image(556, 932, 50, 50)
+        self.bottom_aim_r.append(image)
+        image = sprite_sheet.get_image(607, 932, 50, 50)
+        self.bottom_aim_r.append(image)
+        image = sprite_sheet.get_image(658, 932, 50, 50)
+        self.bottom_aim_r.append(image)
+        image = sprite_sheet.get_image(709, 932, 50, 50)
+        self.bottom_aim_r.append(image)
+        image = sprite_sheet.get_image(760, 932, 50, 50)
+        self.bottom_aim_r.append(image)
+        image = sprite_sheet.get_image(811, 932, 50, 50)
+        self.bottom_aim_r.append(image)
+
+        image = sprite_sheet.get_image(454, 932, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.bottom_aim_l.append(image)
+        image = sprite_sheet.get_image(505, 932, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.bottom_aim_l.append(image)
+        image = sprite_sheet.get_image(556, 932, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.bottom_aim_l.append(image)
+        image = sprite_sheet.get_image(607, 932, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.bottom_aim_l.append(image)
+        image = sprite_sheet.get_image(658, 932, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.bottom_aim_l.append(image)
+        image = sprite_sheet.get_image(709, 932, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.bottom_aim_l.append(image)
+        image = sprite_sheet.get_image(760, 932, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.bottom_aim_l.append(image)
+        image = sprite_sheet.get_image(811, 932, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.bottom_aim_l.append(image)
+
+        image = sprite_sheet.get_image(24, 143, 50, 50)
+        self.idle_r.append(image)
+
+        image = sprite_sheet.get_image(24, 200, 50, 50)
+        self.idle_l.append(image)
+
+        image = sprite_sheet.get_image(202, 143, 50, 50)
+        self.jump_frame_r.append(image)
+
+        image = sprite_sheet.get_image(25, 683, 50, 50)
+        self.idle_mid_aim_r.append(image)
+
+        image = sprite_sheet.get_image(81, 683, 50, 50)
+        self.idle_top_aim_r.append(image)
+
+        image = sprite_sheet.get_image(137, 676, 50, 57)
+        self.idle_top_r.append(image)
+
+        image = sprite_sheet.get_image(25, 746, 50, 50)
+        self.idle_bottom_mid_r.append(image)
+
+        image = sprite_sheet.get_image(81, 746, 50, 50)
+        self.idle_bottom_aim_r.append(image)
+
+        image = sprite_sheet.get_image(137, 739, 50, 57)
+        self.idle_bottom_r.append(image)
+
+        image = sprite_sheet.get_image(25, 683, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.idle_mid_aim_l.append(image)
+
+        image = sprite_sheet.get_image(81, 683, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.idle_top_aim_l.append(image)
+
+        image = sprite_sheet.get_image(137, 676, 50, 57)
+        image = pygame.transform.flip(image, True, False)
+        self.idle_top_l.append(image)
+
+        image = sprite_sheet.get_image(25, 746, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.idle_bottom_mid_l.append(image)
+
+        image = sprite_sheet.get_image(81, 746, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.idle_bottom_aim_l.append(image)
+
+        image = sprite_sheet.get_image(137, 739, 50, 57)
+        image = pygame.transform.flip(image, True, False)
+        self.idle_bottom_l.append(image)
+
+        image = sprite_sheet.get_image(202, 143, 50, 50)
+        image = pygame.transform.flip(image, True, False)
+        self.jump_frame_l.append(image)
+
+        self.last_loc = self.rect.x
+        self.frame = 0
+        self.image = self.idle_r[self.frame]
+
+    def update(self):
+        collide = pygame.sprite.spritecollide(self, plat_groupp, False)
+        if collide:
+            self.rect. = platfromer
+        if self.gravity <= -9:
+            self.gravity = -9
+        self.rect.y -= self.gravity
+        self.gravity -= self.acc
+        keystate = pygame.key.get_pressed()
+        if keystate[pygame.K_d]:
+            self.speed_x = 7
+            if self.last_loc <= self.rect.x:
+                self.last_loc = self.rect.x
+                if degrees_2 < 14.6 and degrees_2 > -14.6:
+                    self.image = self.walk_frames_r[self.frame]
+                    self.dir = 'R'
+                    self.frame += 1
+                    if self.frame >= 8:
+                        self.frame = 0
+                if degrees_2 > 14.5 and degrees_2 < 46:
+                    self.image = self.bottom_aim_mid_r[self.frame]
+                    self.dir = 'R'
+                    self.frame += 1
+                    if self.frame >= 8:
+                        self.frame = 0
+                if degrees_2 > 45 and degrees_2 < 90:
+                    self.image = self.bottom_aim_r[self.frame]
+                    self.dir = 'R'
+                    self.frame += 1
+                    if self.frame >= 8:
+                        self.frame = 0
+                if degrees_2 < -46 and degrees_2 > -90:
+                    self.image = self.top_aim_r[self.frame]
+                    self.frame += 1
+                    self.dir = 'R'
+                    if self.frame >= 8:
+                        self.frame = 0
+                if degrees_2 > -46 and degrees_2 < - 14.6:
+                    self.image = self.mid_aim_r[self.frame]
+                    self.dir = 'R'
+                    self.frame += 1
+                    if self.frame >= 8:
+                        self.frame = 0
+                if degrees_2 > 165.4 or degrees_2 < -165.4:
+                    self.image = self.walk_frames_l[self.frame]
+                    self.frame += 1
+                    self.dir = "L"
+                    if self.frame >= 8:
+                        self.frame = 0
+                if degrees_2 > -135 and degrees_2 < -90:
+                    self.image = self.top_aim_l[self.frame]
+                    self.frame += 1
+                    self.dir = "L"
+                    if self.frame >= 8:
+                        self.frame = 0
+                if degrees_2 > -165.4 and degrees_2 < -135:
+                    self.image = self.mid_aim_l[self.frame]
+                    self.frame += 1
+                    self.dir = "L"
+                    if self.frame >= 8:
+                        self.frame = 0
+                if degrees_2 > 90 and degrees_2 < 135:
+                    self.image = self.bottom_aim_l[self.frame]
+                    self.frame += 1
+                    self.dir = "L"
+                    if self.frame >= 8:
+                        self.frame = 0
+
+                if degrees_2 > 135 and degrees_2 < 165.4:
+                    self.image = self.bottom_aim_mid_l[self.frame]
+                    self.frame += 1
+                    self.dir = "L"
+                    if self.frame >= 8:
+                        self.frame = 0
+
+        elif keystate[pygame.K_a]:
+            self.speed_x = -7
+            if self.last_loc >= self.rect.x:
+                self.last_loc = self.rect.x
+                if degrees_2 < 14.6 and degrees_2 > -14.6:
+                    self.image = self.walk_frames_r[self.frame]
+                    self.dir = 'R'
+                    self.frame += 1
+                    if self.frame >= 8:
+                        self.frame = 0
+                if degrees_2 > 14.5 and degrees_2 < 46:
+                    self.image = self.bottom_aim_mid_r[self.frame]
+                    self.dir = 'R'
+                    self.frame += 1
+                    if self.frame >= 8:
+                        self.frame = 0
+                if degrees_2 > 45 and degrees_2 < 90:
+                    self.image = self.bottom_aim_r[self.frame]
+                    self.dir = 'R'
+                    self.frame += 1
+                    if self.frame >= 8:
+                        self.frame = 0
+                if degrees_2 < -46 and degrees_2 > -90:
+                    self.image = self.top_aim_r[self.frame]
+                    self.frame += 1
+                    self.dir = 'R'
+                    if self.frame >= 8:
+                        self.frame = 0
+                if degrees_2 > -46 and degrees_2 < - 14.6:
+                    self.image = self.mid_aim_r[self.frame]
+                    self.dir = 'R'
+                    self.frame += 1
+                    if self.frame >= 8:
+                        self.frame = 0
+                if degrees_2 > 165.4 or degrees_2 < -165.4:
+                    self.image = self.walk_frames_l[self.frame]
+                    self.frame += 1
+                    self.dir = "L"
+                    if self.frame >= 8:
+                        self.frame = 0
+                if degrees_2 > -135 and degrees_2 < -90:
+                    self.image = self.top_aim_l[self.frame]
+                    self.frame += 1
+                    self.dir = "L"
+                    if self.frame >= 8:
+                        self.frame = 0
+                if degrees_2 > -165.4 and degrees_2 < -135:
+                    self.image = self.mid_aim_l[self.frame]
+                    self.frame += 1
+                    self.dir = "L"
+                    if self.frame >= 8:
+                        self.frame = 0
+                if degrees_2 > 90 and degrees_2 < 135:
+                    self.image = self.bottom_aim_l[self.frame]
+                    self.frame += 1
+                    self.dir = "L"
+                    if self.frame >= 8:
+                        self.frame = 0
+                if degrees_2 > 135 and degrees_2 < 165.4:
+                    self.image = self.bottom_aim_mid_l[self.frame]
+                    self.frame += 1
+                    self.dir = "L"
+                    if self.frame >= 8:
+                        self.frame = 0
+        else:
+            self.frame = 0
+            self.speed_x = 0
+            if degrees_2 < 14.6 and degrees_2 > -14.6:
+                self.image = self.idle_r[self.frame]
+            if degrees_2 > 14.5 and degrees_2 < 46:
+                self.image = self.idle_bottom_mid_r[self.frame]
+            if degrees_2 > 45 and degrees_2 < 74.5:
+                self.image = self.idle_bottom_aim_r[self.frame]
+            if degrees_2 < -46 and degrees_2 > -74.5:
+                self.image = self.idle_top_aim_r[self.frame]
+            if degrees_2 > -46 and degrees_2 < - 14.6:
+                self.image = self.idle_mid_aim_r[self.frame]
+            if degrees_2 > 165.4 or degrees_2 < -165.4:
+                self.image = self.idle_l[self.frame]
+            if degrees_2 > -135 and degrees_2 < -105.5:
+                self.image = self.idle_top_aim_l[self.frame]
+            if degrees_2 > -165.4 and degrees_2 < -135:
+                self.image = self.idle_mid_aim_l[self.frame]
+            if degrees_2 > 105.5 and degrees_2 < 135:
+                self.image = self.idle_bottom_aim_l[self.frame]
+            if degrees_2 > 135 and degrees_2 < 165.4:
+                self.image = self.idle_bottom_mid_l[self.frame]
+        self.rect.x += self.speed_x
+        if self.rect.bottom >= 540:
+            self.rect.bottom = 540
+        if self.rect.left <= 0:
+            self.rect.left = 0
+            self.speed_x = 0
+        if self.rect.right >= WIDTH - 25:
+            self.rect.right = WIDTH - 25
+            self.speed_x = 0
+
+        elif keystate[pygame.K_w]:
+            self.gravity = 8
+
+
+class Bullet(pygame.sprite.Sprite):
+    def __init__(self, bullet_x, bullet_y):
+
+        pygame.sprite.Sprite.__init__(self)
+        self.speed = 1
+        # print("bep")
+        self.mouse_x, self.mouse_y = pygame.mouse.get_pos()
+        self.radians_2 = math.atan2(self.mouse_y - kilroy.rect.y, self.mouse_x - kilroy.rect.x)
+        self.degrees_2 = 180 * self.radians_2 / math.pi
+        self.image = pygame.Surface([20, 20])
+        self.image = bullet_img
+        self.rect = self.image.get_rect()
+        self.image.set_colorkey(WHITE)
+        self.speed_x = 0
+        self.speed_y = 0
+        self.rect.x = bullet_x
+        self.rect.y = bullet_y
+        x, y = bullet_x, bullet_y
+        self.pmx, self.pmy = x, y
+
+    def update(self):
+        self.speed = 25
+
+        if self.degrees_2 >= -135 and self.degrees_2 <= -105.5:
+            self.mx, self.my = self.rect.x - 100, self.rect.y - 100
+        if self.degrees_2 >= -165.4 and self.degrees_2 <= -135:
+            self.mx, self.my = self.rect.x - 100, self.rect.y - 50
+        if self.degrees_2 >= 165.4 or self.degrees_2 <= -165.4:
+            self.mx, self.my = self.rect.x - 100, self.rect.y
+        if self.degrees_2 >= 105.5 and self.degrees_2 <= 135:
+            self.mx, self.my = self.rect.x - 100, self.rect.y + 100
+        if self.degrees_2 >= 135 and self.degrees_2 <= 165.4:
+            self.mx, self.my = self.rect.x - 100, self.rect.y + 50
+        if self.degrees_2 <= -46 and self.degrees_2 >= -90:
+            self.mx, self.my = self.rect.x + 100, self.rect.y - 100
+        if self.degrees_2 >= -46 and self.degrees_2 <= - 14.6:
+            self.mx, self.my = self.rect.x + 100, self.rect.y - 50
+        if self.degrees_2 <= 14.6 and self.degrees_2 >= -14.6:
+            self.mx, self.my = self.rect.x + 100, self.rect.y
+        if self.degrees_2 >= 14.5 and self.degrees_2 <= 46:
+            self.mx, self.my = self.rect.x + 100, self.rect.y + 50
+        if self.degrees_2 >= 45 and self.degrees_2 <= 74.5:
+            self.mx, self.my = self.rect.x + 100, self.rect.y + 100
+        self.radians = math.atan2(self.my - self.rect.y, self.mx - self.rect.x)
+        self.distance = math.hypot(self.mx - self.pmx, self.my - self.pmy) / self.speed
+        self.distance = int(self.distance)
+        self.dx = math.cos(self.radians) * self.speed
+        self.dy = math.sin(self.radians) * self.speed
+        self.degrees = 180 * self.radians / math.pi
+
+        if self.distance:
+            self.rect.x += self.dx
+            self.rect.y += self.dy
+        if self.rect.x >= WIDTH or self.rect.y >= HEIGHT or self.rect.y <= 0 or self.rect.x <= 0:
+            self.kill()
+
+
+class Platform(pygame.sprite.Sprite):
+    def __init__(self, plat_x, plat_y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = floor_tile_img
+        self.rect = self.image.get_rect()
+        # self.image.fill(BLACK)
+        self.rect.x = plat_x
+        self.rect.y = plat_y
+
+    def update(self):
+        self.rect.x -= kilroy.speed_x
+
+
+# ===============Add all Sprites=========
+all_sprites_list = pygame.sprite.Group()
+
+kilroy = Player()
+all_sprites_list.add(kilroy)
+kilroy_group = pygame.sprite.Group()
+
+bullet_group = pygame.sprite.Group()
+
+plat_groupp = pygame.sprite.Group()
+platfromer = Platform(100, 100)
+plat_x_2 = 50
+for i in range(36):
+    platfromer = Platform(plat_x_2, 450)
+    plat_x_2 += 50
+    plat_groupp.add(platfromer)
+    all_sprites_list.add(platfromer)
+
+# ======================Define Variables=================
+
+stage_pos_x = 0
+
+dx, dy = 0, 0
+distance = 0
+# speed = 14
+last_update = pygame.time.get_ticks()
+# =============== ==========game loop=====================
+running = True
+while running:
+    mouse_x, mouse_y = pygame.mouse.get_pos()
+
+    now = pygame.time.get_ticks()
+    screen.fill(BLACK)
+    clock.tick(FPS)
+    radians_2 = math.atan2(mouse_y - kilroy.rect.y, mouse_x - kilroy.rect.x)
+    degrees_2 = 180 * radians_2 / math.pi
+    radians_3 = math.atan2(mouse_y - kilroy.rect.y, mouse_x - kilroy.rect.x)
+    degrees_3 = 180 * radians_3 / math.pi
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE and now - last_update > 100:
+                print(pygame.mouse.get_pos())
+                if degrees_3 <= 70 and degrees_3 >= -75:
+                    last_update = pygame.time.get_ticks()
+                    if degrees_3 <= 14.6 and degrees_3 >= -14.6:
+                        bullet_x = kilroy.rect.x + 63
+                        bullet_y = kilroy.rect.y + 7
+                        bullet = Bullet(bullet_x, bullet_y)
+                        all_sprites_list.add(bullet)
+
+                    if degrees_3 >= 14.5 and degrees_3 <= 46:
+                        bullet_x = kilroy.rect.x + 44
+                        bullet_y = kilroy.rect.y + 27
+                        bullet = Bullet(bullet_x, bullet_y)
+                        all_sprites_list.add(bullet)
+
+                    if degrees_3 >= 45 and degrees_3 <= 74.5:
+                        bullet_x = kilroy.rect.x + 39
+                        bullet_y = kilroy.rect.y + 36
+                        bullet = Bullet(bullet_x, bullet_y)
+                        all_sprites_list.add(bullet)
+
+                    if degrees_3 <= -46 and degrees_3 >= -74.5:
+                        bullet_x = kilroy.rect.x + 57
+                        bullet_y = kilroy.rect.y - 10
+                        bullet = Bullet(bullet_x, bullet_y)
+                        all_sprites_list.add(bullet)
+
+                    if degrees_3 >= -46 and degrees_3 <= - 14.6:
+                        bullet_x = kilroy.rect.x + 57
+                        bullet_y = kilroy.rect.y - 10
+                        bullet = Bullet(bullet_x, bullet_y)
+                        all_sprites_list.add(bullet)
+
+                elif degrees_3 <= -100 or degrees_3 >= 95:
+                    print(degrees_3)
+                    if degrees_3 >= 105.5 and degrees_3 <= 135:
+                        bullet_x = kilroy.rect.x - 18
+                        bullet_y = kilroy.rect.y + 40
+                        bullet = Bullet(bullet_x, bullet_y)
+                        all_sprites_list.add(bullet)
+
+                    if degrees_3 >= 135 and degrees_3 <= 165.4:
+                        bullet_x = kilroy.rect.x - 22
+                        bullet_y = kilroy.rect.y + 26
+                        bullet = Bullet(bullet_x, bullet_y)
+                        all_sprites_list.add(bullet)
+
+                    if degrees_3 >= 165.4 or degrees_3 <= -165.4:
+                        bullet_x = kilroy.rect.x - 39
+                        bullet_y = kilroy.rect.y + 7
+                        bullet = Bullet(bullet_x, bullet_y)
+                        all_sprites_list.add(bullet)
+
+                    if degrees_3 >= -135 and degrees_3 <= -105.5:
+                        bullet_x = kilroy.rect.x - 18
+                        bullet_y = kilroy.rect.y - 28
+                        bullet = Bullet(bullet_x, bullet_y)
+                        all_sprites_list.add(bullet)
+
+                    if degrees_3 >= -165.4 and degrees_3 <= -135:
+                        bullet_x = kilroy.rect.x - 28
+                        bullet_y = kilroy.rect.y - 17
+                        bullet = Bullet(bullet_x, bullet_y)
+                        all_sprites_list.add(bullet)
+    if stage_pos_x <= -400:
+        stage_pos_x = -400
+    elif kilroy.rect.x >= WIDTH / 2 - 100:
+        stage_pos_x -= kilroy.speed_x
+        plat_x_2 -= kilroy.speed_x
+        kilroy.rect.x = WIDTH / 2 - 100
+    screen.blit(space_back, [stage_pos_x, 0])
+    all_sprites_list.update()
+    all_sprites_list.draw(screen)
+    pygame.display.flip()
+pygame.quit()
