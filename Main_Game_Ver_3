@@ -26,7 +26,7 @@ GRAY = (128, 128, 128)
 PURPLE = (77, 75, 118)
 
 # =========================Sprites Images=====================
-img_dir = path.join(path.dirname(__file__), 'H:')
+img_dir = path.join(path.dirname(__file__), 'H:\\Images')
 
 space_back = pygame.image.load(path.join(img_dir, "full-background.png")).convert()
 space_back = pygame.transform.scale(space_back, [1200, HEIGHT])
@@ -332,9 +332,6 @@ class Player(pygame.sprite.Sprite):
         image = sprite_sheet.get_image(24, 200, 50, 50)
         self.idle_l.append(image)
 
-        image = sprite_sheet.get_image(202, 143, 50, 50)
-        self.jump_frame_r.append(image)
-
         image = sprite_sheet.get_image(25, 683, 50, 50)
         self.idle_mid_aim_r.append(image)
 
@@ -377,7 +374,10 @@ class Player(pygame.sprite.Sprite):
         image = pygame.transform.flip(image, True, False)
         self.idle_bottom_l.append(image)
 
-        image = sprite_sheet.get_image(202, 143, 50, 50)
+        image = sprite_sheet.get_image(126, 143, 50, 50)
+        self.jump_frame_r.append(image)
+
+        image = sprite_sheet.get_image(126, 143, 50, 50)
         image = pygame.transform.flip(image, True, False)
         self.jump_frame_l.append(image)
 
@@ -388,12 +388,14 @@ class Player(pygame.sprite.Sprite):
         self.acc = -.4
 
     def update(self):
-
         keystate = pygame.key.get_pressed()
+
+        self.rect.y -= self.gravity
+        self.gravity += self.acc
         collide = pygame.sprite.spritecollide(self, plat_groupp, False)
         if keystate[pygame.K_w] and collide:
-            self.gravity = 6
-            self.acc = -.4
+                self.gravity = 6
+                self.acc = -.4
         elif collide:
             self.rect.bottom = platfromer.rect.top + 1
             self.gravity = 0
@@ -401,13 +403,21 @@ class Player(pygame.sprite.Sprite):
         elif not collide and self.gravity == 0:
             self.gravity = -6
             self.acc = -.4
+        elif not collide and self.gravity != 0:
+            if self.dir == "R":
+                print("whyounowork")
+                self.frame = 0
+                # self.dir = "R"
+                self.image = self.jump_frame_r[self.frame]
+                print("WORK")
+            if self.dir == "L":
+                self.frame = 0
+                # self.dir = "L"
+                self.image = self.jump_frame_l[self.frame]
         if self.gravity <= -30:
             self.gravity = -30
 
-        self.rect.y -= self.gravity
-        self.gravity += self.acc
-
-        if keystate[pygame.K_d]:
+        elif keystate[pygame.K_d]:
             self.speed_x = 7
             if self.last_loc <= self.rect.x:
                 self.last_loc = self.rect.x
