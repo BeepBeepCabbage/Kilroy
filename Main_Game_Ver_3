@@ -405,11 +405,11 @@ class Player(pygame.sprite.Sprite):
             self.acc = -.4
         elif not collide and self.gravity != 0:
             if self.dir == "R":
-                print("whyounowork")
+                # print("whyounowork")
                 self.frame = 0
                 # self.dir = "R"
                 self.image = self.jump_frame_r[self.frame]
-                print("WORK")
+                # print("WORK")
             if self.dir == "L":
                 self.frame = 0
                 # self.dir = "L"
@@ -419,64 +419,65 @@ class Player(pygame.sprite.Sprite):
 
         elif keystate[pygame.K_d]:
             self.speed_x = 7
+            print(self.speed_x)
             if self.last_loc <= self.rect.x:
                 self.last_loc = self.rect.x
-                if degrees_2 < 14.6 and degrees_2 > -14.6:
+                if degrees_2 < 14.6 and degrees_2 > -14.6 and collide:
                     self.image = self.walk_frames_r[self.frame]
                     self.dir = 'R'
                     self.frame += 1
                     if self.frame >= 8:
                         self.frame = 0
-                if degrees_2 > 14.5 and degrees_2 < 46:
+                if degrees_2 > 14.5 and degrees_2 < 46 and collide:
                     self.image = self.bottom_aim_mid_r[self.frame]
                     self.dir = 'R'
                     self.frame += 1
                     if self.frame >= 8:
                         self.frame = 0
-                if degrees_2 > 45 and degrees_2 < 90:
+                if degrees_2 > 45 and degrees_2 < 90 and collide:
                     self.image = self.bottom_aim_r[self.frame]
                     self.dir = 'R'
                     self.frame += 1
                     if self.frame >= 8:
                         self.frame = 0
-                if degrees_2 < -46 and degrees_2 > -90:
+                if degrees_2 < -46 and degrees_2 > -90 and collide:
                     self.image = self.top_aim_r[self.frame]
                     self.frame += 1
                     self.dir = 'R'
                     if self.frame >= 8:
                         self.frame = 0
-                if degrees_2 > -46 and degrees_2 < - 14.6:
+                if degrees_2 > -46 and degrees_2 < - 14.6 and collide:
                     self.image = self.mid_aim_r[self.frame]
                     self.dir = 'R'
                     self.frame += 1
                     if self.frame >= 8:
                         self.frame = 0
-                if degrees_2 > 165.4 or degrees_2 < -165.4:
+                if degrees_2 > 165.4 or degrees_2 < -165.4 and collide:
                     self.image = self.walk_frames_l[self.frame]
                     self.frame += 1
                     self.dir = "L"
                     if self.frame >= 8:
                         self.frame = 0
-                if degrees_2 > -135 and degrees_2 < -90:
+                if degrees_2 > -135 and degrees_2 < -90 and collide:
                     self.image = self.top_aim_l[self.frame]
                     self.frame += 1
                     self.dir = "L"
                     if self.frame >= 8:
                         self.frame = 0
-                if degrees_2 > -165.4 and degrees_2 < -135:
+                if degrees_2 > -165.4 and degrees_2 < -135 and collide:
                     self.image = self.mid_aim_l[self.frame]
                     self.frame += 1
                     self.dir = "L"
                     if self.frame >= 8:
                         self.frame = 0
-                if degrees_2 > 90 and degrees_2 < 135:
+                if degrees_2 > 90 and degrees_2 < 135 and collide:
                     self.image = self.bottom_aim_l[self.frame]
                     self.frame += 1
                     self.dir = "L"
                     if self.frame >= 8:
                         self.frame = 0
 
-                if degrees_2 > 135 and degrees_2 < 165.4:
+                if degrees_2 > 135 and degrees_2 < 165.4 and collide:
                     self.image = self.bottom_aim_mid_l[self.frame]
                     self.frame += 1
                     self.dir = "L"
@@ -487,61 +488,61 @@ class Player(pygame.sprite.Sprite):
             self.speed_x = -7
             if self.last_loc >= self.rect.x:
                 self.last_loc = self.rect.x
-                if degrees_2 < 14.6 and degrees_2 > -14.6:
+                if degrees_2 < 14.6 and degrees_2 > -14.6 and collide:
                     self.image = self.walk_frames_r[self.frame]
                     self.dir = 'R'
                     self.frame += 1
                     if self.frame >= 8:
                         self.frame = 0
-                if degrees_2 > 14.5 and degrees_2 < 46:
+                if degrees_2 > 14.5 and degrees_2 < 46 and collide:
                     self.image = self.bottom_aim_mid_r[self.frame]
                     self.dir = 'R'
                     self.frame += 1
                     if self.frame >= 8:
                         self.frame = 0
-                if degrees_2 > 45 and degrees_2 < 90:
+                if degrees_2 > 45 and degrees_2 < 90 and collide:
                     self.image = self.bottom_aim_r[self.frame]
                     self.dir = 'R'
                     self.frame += 1
                     if self.frame >= 8:
                         self.frame = 0
-                if degrees_2 < -46 and degrees_2 > -90:
+                if degrees_2 < -46 and degrees_2 > -90 and collide:
                     self.image = self.top_aim_r[self.frame]
                     self.frame += 1
                     self.dir = 'R'
                     if self.frame >= 8:
                         self.frame = 0
-                if degrees_2 > -46 and degrees_2 < - 14.6:
+                if degrees_2 > -46 and degrees_2 < - 14.6 and collide:
                     self.image = self.mid_aim_r[self.frame]
                     self.dir = 'R'
                     self.frame += 1
                     if self.frame >= 8:
                         self.frame = 0
-                if degrees_2 > 165.4 or degrees_2 < -165.4:
+                if degrees_2 > 165.4 or degrees_2 < -165.4 and collide:
                     self.image = self.walk_frames_l[self.frame]
                     self.frame += 1
                     self.dir = "L"
                     if self.frame >= 8:
                         self.frame = 0
-                if degrees_2 > -135 and degrees_2 < -90:
+                if degrees_2 > -135 and degrees_2 < -90 and collide:
                     self.image = self.top_aim_l[self.frame]
                     self.frame += 1
                     self.dir = "L"
                     if self.frame >= 8:
                         self.frame = 0
-                if degrees_2 > -165.4 and degrees_2 < -135:
+                if degrees_2 > -165.4 and degrees_2 < -135 and collide:
                     self.image = self.mid_aim_l[self.frame]
                     self.frame += 1
                     self.dir = "L"
                     if self.frame >= 8:
                         self.frame = 0
-                if degrees_2 > 90 and degrees_2 < 135:
+                if degrees_2 > 90 and degrees_2 < 135 and collide:
                     self.image = self.bottom_aim_l[self.frame]
                     self.frame += 1
                     self.dir = "L"
                     if self.frame >= 8:
                         self.frame = 0
-                if degrees_2 > 135 and degrees_2 < 165.4:
+                if degrees_2 > 135 and degrees_2 < 165.4 and collide:
                     self.image = self.bottom_aim_mid_l[self.frame]
                     self.frame += 1
                     self.dir = "L"
@@ -551,25 +552,35 @@ class Player(pygame.sprite.Sprite):
         else:
             self.frame = 0
             self.speed_x = 0
-            if degrees_2 < 14.6 and degrees_2 > -14.6:
+            if degrees_2 < 14.6 and degrees_2 > -14.6 and collide:
                 self.image = self.idle_r[self.frame]
-            if degrees_2 > 14.5 and degrees_2 < 46:
+                self.dir = "R"
+            if degrees_2 > 14.5 and degrees_2 < 46 and collide:
+                self.dir = "R"
                 self.image = self.idle_bottom_mid_r[self.frame]
-            if degrees_2 > 45 and degrees_2 < 74.5:
+            if degrees_2 > 45 and degrees_2 < 74.5 and collide:
+                self.dir = "R"
                 self.image = self.idle_bottom_aim_r[self.frame]
-            if degrees_2 < -46 and degrees_2 > -74.5:
+            if degrees_2 < -46 and degrees_2 > -74.5 and collide:
+                self.dir = "R"
                 self.image = self.idle_top_aim_r[self.frame]
-            if degrees_2 > -46 and degrees_2 < - 14.6:
+            if degrees_2 > -46 and degrees_2 < - 14.6 and collide:
                 self.image = self.idle_mid_aim_r[self.frame]
-            if degrees_2 > 165.4 or degrees_2 < -165.4:
+                self.dir = "R"
+            if degrees_2 > 165.4 or degrees_2 < -165.4 and collide:
+                self.dir = "L"
                 self.image = self.idle_l[self.frame]
-            if degrees_2 > -135 and degrees_2 < -105.5:
+            if degrees_2 > -135 and degrees_2 < -105.5 and collide:
+                self.dir = "L"
                 self.image = self.idle_top_aim_l[self.frame]
-            if degrees_2 > -165.4 and degrees_2 < -135:
+            if degrees_2 > -165.4 and degrees_2 < -135 and collide:
                 self.image = self.idle_mid_aim_l[self.frame]
-            if degrees_2 > 105.5 and degrees_2 < 135:
+                self.dir = "L"
+            if degrees_2 > 105.5 and degrees_2 < 135 and collide:
+                self.dir = "L"
                 self.image = self.idle_bottom_aim_l[self.frame]
-            if degrees_2 > 135 and degrees_2 < 165.4:
+            if degrees_2 > 135 and degrees_2 < 165.4 and collide:
+                self.dir = "L"
                 self.image = self.idle_bottom_mid_l[self.frame]
         self.rect.x += self.speed_x
         if self.rect.bottom >= 540:
