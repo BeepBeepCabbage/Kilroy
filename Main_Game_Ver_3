@@ -26,7 +26,7 @@ GRAY = (128, 128, 128)
 PURPLE = (77, 75, 118)
 
 # =========================Sprites Images=====================
-img_dir = path.join(path.dirname(__file__), 'D:')
+img_dir = path.join(path.dirname(__file__), 'H:')
 
 space_back = pygame.image.load(path.join(img_dir, "full-background.png")).convert()
 space_back = pygame.transform.scale(space_back, [1200, HEIGHT])
@@ -80,8 +80,6 @@ class Player(pygame.sprite.Sprite):
         self.speed_x = 0
         self.speed_y = -200
         self.dir = "R"
-        self.gravity = -6
-        self.acc = -.4
 
         sprite_sheet = SpriteSheet("OpenGunnerHeroVer2.png")
 
@@ -386,25 +384,30 @@ class Player(pygame.sprite.Sprite):
         self.last_loc = self.rect.x
         self.frame = 0
         self.image = self.idle_r[self.frame]
+        self.gravity = -6
+        self.acc = -.4
 
     def update(self):
+
         keystate = pygame.key.get_pressed()
         collide = pygame.sprite.spritecollide(self, plat_groupp, False)
-        if self.gravity < 0:
-            if collide:
-                self.rect.bottom = platfromer.rect.top
-                self.gravity = 0
-                self.acc = 0
-
+        if keystate[pygame.K_w] and collide:
+            self.gravity = 6
+            self.acc = -.4
+        elif collide:
+            self.rect.bottom = platfromer.rect.top + 1
+            self.gravity = 0
+            self.acc = 0
+        elif not collide and self.gravity == 0:
+            self.gravity = -6
+            self.acc = -.4
         if self.gravity <= -30:
             self.gravity = -30
 
         self.rect.y -= self.gravity
         self.gravity += self.acc
-        if keystate[pygame.K_w]:
-            self.gravity = 6
-            self.acc = -.4
-        elif keystate[pygame.K_d]:
+
+        if keystate[pygame.K_d]:
             self.speed_x = 7
             if self.last_loc <= self.rect.x:
                 self.last_loc = self.rect.x
@@ -682,7 +685,6 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE and now - last_update > 100:
-                print(pygame.mouse.get_pos())
                 if degrees_3 <= 70 and degrees_3 >= -75:
                     last_update = pygame.time.get_ticks()
                     if degrees_3 <= 14.6 and degrees_3 >= -14.6:
