@@ -394,8 +394,8 @@ class Player(pygame.sprite.Sprite):
         self.gravity += self.acc
         collide = pygame.sprite.spritecollide(self, plat_groupp, False)
         if keystate[pygame.K_w] and collide:
-                self.gravity = 6
-                self.acc = -.4
+            self.gravity = 6
+            self.acc = -.4
         elif collide:
             self.rect.bottom = platfromer.rect.top + 1
             self.gravity = 0
@@ -405,11 +405,9 @@ class Player(pygame.sprite.Sprite):
             self.acc = -.4
         elif not collide and self.gravity != 0:
             if self.dir == "R":
-                # print("whyounowork")
                 self.frame = 0
                 # self.dir = "R"
                 self.image = self.jump_frame_r[self.frame]
-                # print("WORK")
             if self.dir == "L":
                 self.frame = 0
                 # self.dir = "L"
@@ -419,7 +417,6 @@ class Player(pygame.sprite.Sprite):
 
         elif keystate[pygame.K_d]:
             self.speed_x = 7
-            print(self.speed_x)
             if self.last_loc <= self.rect.x:
                 self.last_loc = self.rect.x
                 if degrees_2 < 14.6 and degrees_2 > -14.6 and collide:
@@ -595,7 +592,6 @@ class Player(pygame.sprite.Sprite):
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, bullet_x, bullet_y):
-
         pygame.sprite.Sprite.__init__(self)
         self.speed = 1
         self.mouse_x, self.mouse_y = pygame.mouse.get_pos()
@@ -614,27 +610,32 @@ class Bullet(pygame.sprite.Sprite):
 
     def update(self):
         self.speed = 25
-
-        if self.degrees_2 >= -135 and self.degrees_2 <= -105.5:
-            self.mx, self.my = self.rect.x - 100, self.rect.y - 100
-        if self.degrees_2 >= -165.4 and self.degrees_2 <= -135:
-            self.mx, self.my = self.rect.x - 100, self.rect.y - 50
-        if self.degrees_2 >= 165.4 or self.degrees_2 <= -165.4:
-            self.mx, self.my = self.rect.x - 100, self.rect.y
-        if self.degrees_2 >= 105.5 and self.degrees_2 <= 135:
-            self.mx, self.my = self.rect.x - 100, self.rect.y + 100
-        if self.degrees_2 >= 135 and self.degrees_2 <= 165.4:
-            self.mx, self.my = self.rect.x - 100, self.rect.y + 50
-        if self.degrees_2 <= -46 and self.degrees_2 >= -90:
-            self.mx, self.my = self.rect.x + 100, self.rect.y - 100
-        if self.degrees_2 >= -46 and self.degrees_2 <= - 14.6:
-            self.mx, self.my = self.rect.x + 100, self.rect.y - 50
-        if self.degrees_2 <= 14.6 and self.degrees_2 >= -14.6:
-            self.mx, self.my = self.rect.x + 100, self.rect.y
-        if self.degrees_2 >= 14.5 and self.degrees_2 <= 46:
-            self.mx, self.my = self.rect.x + 100, self.rect.y + 50
-        if self.degrees_2 >= 45 and self.degrees_2 <= 74.5:
-            self.mx, self.my = self.rect.x + 100, self.rect.y + 100
+        if collide_2:
+            if self.degrees_2 >= -135 and self.degrees_2 <= -105.5 :
+                self.mx, self.my = self.rect.x - 100, self.rect.y - 100
+            if self.degrees_2 >= -165.4 and self.degrees_2 <= -135:
+                self.mx, self.my = self.rect.x - 100, self.rect.y - 50
+            if self.degrees_2 >= 165.4 or self.degrees_2 <= -165.4:
+                self.mx, self.my = self.rect.x - 100, self.rect.y
+            if self.degrees_2 >= 105.5 and self.degrees_2 <= 135:
+                self.mx, self.my = self.rect.x - 100, self.rect.y + 100
+            if self.degrees_2 >= 135 and self.degrees_2 <= 165.4:
+                self.mx, self.my = self.rect.x - 100, self.rect.y + 50
+            if self.degrees_2 <= -46 and self.degrees_2 >= -90:
+                self.mx, self.my = self.rect.x + 100, self.rect.y - 100
+            if self.degrees_2 >= -46 and self.degrees_2 <= - 14.6:
+                self.mx, self.my = self.rect.x + 100, self.rect.y - 50
+            if self.degrees_2 <= 14.6 and self.degrees_2 >= -14.6:
+                self.mx, self.my = self.rect.x + 100, self.rect.y
+            if self.degrees_2 >= 14.5 and self.degrees_2 <= 46:
+                self.mx, self.my = self.rect.x + 100, self.rect.y + 50
+            if self.degrees_2 >= 45 and self.degrees_2 <= 74.5:
+                self.mx, self.my = self.rect.x + 100, self.rect.y + 100
+        if kilroy.gravity != 0:
+            if kilroy.dir == "R":
+                self.mx, self.my = self.rect.x + 100, self.rect.y
+            if kilroy.dir == "L":
+                self.mx, self.my = self.rect.x - 100, self.rect.y
         self.radians = math.atan2(self.my - self.rect.y, self.mx - self.rect.x)
         self.distance = math.hypot(self.mx - self.pmx, self.my - self.pmy) / self.speed
         self.distance = int(self.distance)
@@ -692,6 +693,7 @@ last_update = pygame.time.get_ticks()
 running = True
 while running:
     mouse_x, mouse_y = pygame.mouse.get_pos()
+    collide_2 = pygame.sprite.spritecollide(kilroy, plat_groupp, False)
 
     now = pygame.time.get_ticks()
     screen.fill(BLACK)
@@ -706,8 +708,22 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE and now - last_update > 100:
-                if degrees_3 <= 70 and degrees_3 >= -75:
+                if not collide_2:
                     last_update = pygame.time.get_ticks()
+                    if kilroy.dir == "R":
+                        bullet_x = kilroy.rect.x + 63
+                        bullet_y = kilroy.rect.y + 7
+                        bullet = Bullet(bullet_x, bullet_y)
+                        all_sprites_list.add(bullet)
+                    if kilroy.dir == "L":
+                        bullet_x = kilroy.rect.x - 39
+                        bullet_y = kilroy.rect.y + 7
+                        bullet = Bullet(bullet_x, bullet_y)
+                        all_sprites_list.add(bullet)
+
+                if degrees_3 <= 70 and degrees_3 >= -75 and collide_2:
+                    last_update = pygame.time.get_ticks()
+
                     if degrees_3 <= 14.6 and degrees_3 >= -14.6:
                         bullet_x = kilroy.rect.x + 63
                         bullet_y = kilroy.rect.y + 7
@@ -738,8 +754,9 @@ while running:
                         bullet = Bullet(bullet_x, bullet_y)
                         all_sprites_list.add(bullet)
 
-                elif degrees_3 <= -100 or degrees_3 >= 95:
-                    print(degrees_3)
+                elif degrees_3 <= -100 or degrees_3 >= 95 and collide_2:
+                    last_update = pygame.time.get_ticks()
+
                     if degrees_3 >= 105.5 and degrees_3 <= 135:
                         bullet_x = kilroy.rect.x - 18
                         bullet_y = kilroy.rect.y + 40
