@@ -139,15 +139,27 @@ class Turret(pygame.sprite.Sprite):
         image = pygame.transform.flip(image, True, False)
         self.shoot_t_r.append(image)
 
-        self.image = self.idle_s_l[self.frame]
+        self.image = self.idle_t_l[self.frame]
 
     def update(self):
         self.dist = math.hypot(self.rect.x - kilroy.rect.x, self.rect.y - kilroy.rect.y)
-        if self.dist <= 200:
-            bullet_x = self.rect.x - 50
-            bullet_y = self.rect.y
-            bullet = Bullet(bullet_x, bullet_y)
-            all_sprites_list.add(bullet)
+        print(self.dist)
+
+
+class T_Bullet(pygame.sprite.Sprite):
+    def __init__(self, t_bullet_x, t_bullet_y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface([20, 20])
+        self.image = bullet_img
+        self.image.set_colorkey(WHITE)
+        self.rect = self.image.get_rect()
+        self.rect.x = t_bullet_x
+        self.rect.y = t_bullet_y
+
+    def update(self):
+
+        if self.rect.x >= WIDTH or self.rect.y >= HEIGHT or self.rect.y <= 0 or self.rect.x <= 0:
+            self.kill()
 
 
 class Mecha(pygame.sprite.Sprite):
@@ -612,7 +624,7 @@ class Player(pygame.sprite.Sprite):
                     self.frame += 1
                     if self.frame >= 8:
                         self.frame = 0
-                if degrees_2 > 165.4 and collide or degrees_2 < -165.4 and collide:
+                if degrees_2 > 165.4 or degrees_2 < -165.4 and collide:
                     self.image = self.walk_frames_l[self.frame]
                     self.frame += 1
                     self.dir = "L"
@@ -643,29 +655,44 @@ class Player(pygame.sprite.Sprite):
                     if self.frame >= 8:
                         self.frame = 0
 
-        else:
+        elif self.gravity == 0:
             self.frame = 0
             self.speed_x = 0
-            if degrees_2 < 14.6 and degrees_2 > -14.6 and collide:
+            if degrees_2 <= 14.6 and degrees_2 >= -14.6 and collide:
+                self.dir = "R"
                 self.image = self.idle_r[self.frame]
-            if degrees_2 > 14.5 and degrees_2 < 46 and collide:
+            if degrees_2 >= 14.5 and degrees_2 <= 46 and collide:
+                self.dir = "R"
                 self.image = self.idle_bottom_mid_r[self.frame]
-            if degrees_2 > 45 and degrees_2 <= 70 and collide:
+            if degrees_2 >= 45 and degrees_2 <= 74.5 and collide:
+                self.dir = "R"
                 self.image = self.idle_bottom_aim_r[self.frame]
-            if degrees_2 < -46 and degrees_2 >= -75 and collide:
+            if degrees_2 <= -46 and degrees_2 >= -74.5 and collide:
+                self.dir = "R"
                 self.image = self.idle_top_aim_r[self.frame]
-            if degrees_2 > -46 and degrees_2 < - 14.6 and collide:
+            if degrees_2 >= -46 and degrees_2 <= - 14.6 and collide:
+                self.dir = "R"
                 self.image = self.idle_mid_aim_r[self.frame]
-            if degrees_2 > 165.4 and collide or degrees_2 < -165.4 and collide:
+            if degrees_2 >= 165.4 and collide or degrees_2 <= -165.4 and collide:
+                self.dir = "L"
                 self.image = self.idle_l[self.frame]
-            if degrees_2 > -135 and degrees_2 < -105.5 and collide:
+            if degrees_2 >= -135 and degrees_2 <= -100 and collide:
+                self.dir = "L"
                 self.image = self.idle_top_aim_l[self.frame]
-            if degrees_2 > -165.4 and degrees_2 < -135 and collide:
+            if degrees_2 >= -165.4 and degrees_2 <= -135 and collide:
+                self.dir = "L"
                 self.image = self.idle_mid_aim_l[self.frame]
             if degrees_2 > 105.5 and degrees_2 < 135 and collide:
+                self.dir = "L"
                 self.image = self.idle_bottom_aim_l[self.frame]
             if degrees_2 > 135 and degrees_2 < 165.4 and collide:
+                self.dir = "L"
                 self.image = self.idle_bottom_mid_l[self.frame]
+            if degrees_2 > 70 and degrees_2 < 95 or degrees_2 < -74.5 and degrees_2 > -100:
+                if self.dir == "R":
+                    self.image = self.idle_r[self.frame]
+                if self.dir == "L":
+                    self.image = self.idle_l[self.frame]
         self.rect.x += self.speed_x
         if self.rect.bottom >= 540:
             self.rect.bottom = 540
@@ -695,6 +722,10 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.y = bullet_y
         x, y = bullet_x, bullet_y
         self.pmx, self.pmy = x, y
+        self.radians = 0
+        self.degrees = 0
+        self.distance, self.dx, self.dy = 0, 0, 0
+        self.mx, self.my = 0, 0
 
     def update(self):
         bul_col = pygame.sprite.spritecollide(self, plat_groupp, None)
@@ -702,7 +733,7 @@ class Bullet(pygame.sprite.Sprite):
             self.kill()
         self.speed = 25
 
-        if self.degrees_2 >= -135 and self.degrees_2 <= -105.5:
+        if self.degrees_2 >= -135 and self.degrees_2 <= -100:
             self.mx, self.my = self.rect.x - 100, self.rect.y - 100
         if self.degrees_2 >= -165.4 and self.degrees_2 <= -135:
             self.mx, self.my = self.rect.x - 100, self.rect.y - 50
@@ -712,7 +743,7 @@ class Bullet(pygame.sprite.Sprite):
             self.mx, self.my = self.rect.x - 100, self.rect.y + 100
         if self.degrees_2 >= 135 and self.degrees_2 <= 165.4:
             self.mx, self.my = self.rect.x - 100, self.rect.y + 50
-        if self.degrees_2 <= -46 and self.degrees_2 >= -105:
+        if self.degrees_2 <= -46 and self.degrees_2 >= -74.5:
             self.mx, self.my = self.rect.x + 100, self.rect.y - 100
         if self.degrees_2 >= -46 and self.degrees_2 <= - 14.6:
             self.mx, self.my = self.rect.x + 100, self.rect.y - 50
@@ -720,8 +751,9 @@ class Bullet(pygame.sprite.Sprite):
             self.mx, self.my = self.rect.x + 100, self.rect.y
         if self.degrees_2 >= 14.5 and self.degrees_2 <= 46:
             self.mx, self.my = self.rect.x + 100, self.rect.y + 50
-        if self.degrees_2 >= 45 and self.degrees_2 <= 74.5:
+        if self.degrees_2 >= 45 and self.degrees_2 <= 70:
             self.mx, self.my = self.rect.x + 100, self.rect.y + 100
+        # print(self.radians)
         self.radians = math.atan2(self.my - self.rect.y, self.mx - self.rect.x)
         self.distance = math.hypot(self.mx - self.pmx, self.my - self.pmy) / self.speed
         self.distance = int(self.distance)
@@ -753,14 +785,14 @@ class Platform(pygame.sprite.Sprite):
 # ===============Add all Sprites=========
 all_sprites_list = pygame.sprite.Group()
 
-turret = Turret(500, 405)
-all_sprites_list.add(turret)
 kilroy = Player()
 all_sprites_list.add(kilroy)
 kilroy_group = pygame.sprite.Group()
 
 bullet_group = pygame.sprite.Group()
 
+turret = Turret(100, 300)
+all_sprites_list.add(turret)
 plat_groupp = pygame.sprite.Group()
 platfromer = Platform(100, 100)
 plat_x_2 = 50
@@ -797,7 +829,7 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE and now - last_update > 100 and collide:
-                if degrees_3 <= 70 and degrees_3 >= -75:
+                if degrees_3 <= 70 and degrees_3 >= -74.5:
                     last_update = pygame.time.get_ticks()
                     if degrees_3 <= 14.6 and degrees_3 >= -14.6:
                         bullet_x = kilroy.rect.x + 63
@@ -811,7 +843,7 @@ while running:
                         bullet = Bullet(bullet_x, bullet_y)
                         all_sprites_list.add(bullet)
 
-                    if degrees_3 >= 45 and degrees_3 <= 74.5:
+                    if degrees_3 >= 45 and degrees_3 <= 70:
                         bullet_x = kilroy.rect.x + 39
                         bullet_y = kilroy.rect.y + 36
                         bullet = Bullet(bullet_x, bullet_y)
@@ -830,7 +862,7 @@ while running:
                         all_sprites_list.add(bullet)
 
                 elif degrees_3 <= -100 or degrees_3 >= 95:
-                    if degrees_3 >= 105.5 and degrees_3 <= 135:
+                    if degrees_3 >= 95 and degrees_3 <= 135:
                         bullet_x = kilroy.rect.x - 18
                         bullet_y = kilroy.rect.y + 40
                         bullet = Bullet(bullet_x, bullet_y)
@@ -848,7 +880,7 @@ while running:
                         bullet = Bullet(bullet_x, bullet_y)
                         all_sprites_list.add(bullet)
 
-                    if degrees_3 >= -135 and degrees_3 <= -105.5:
+                    if degrees_3 >= -135 and degrees_3 <= -100:
                         bullet_x = kilroy.rect.x - 18
                         bullet_y = kilroy.rect.y - 28
                         bullet = Bullet(bullet_x, bullet_y)
