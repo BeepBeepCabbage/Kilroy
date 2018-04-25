@@ -26,7 +26,7 @@ GRAY = (128, 128, 128)
 PURPLE = (77, 75, 118)
 
 # =========================Sprites Images=====================
-img_dir = path.join(path.dirname(__file__), 'H:\\Images')
+img_dir = path.join(path.dirname(__file__), 'D:')
 
 space_back = pygame.image.load(path.join(img_dir, "full-background.png")).convert()
 space_back = pygame.transform.scale(space_back, [1200, HEIGHT])
@@ -92,7 +92,7 @@ class Turret(pygame.sprite.Sprite):
         self.idle_t_r = []
         self.shoot_t_r = []
 
-        sprite_sheet = SpriteSheet("OpenGunnerEnemies (1).png")
+        sprite_sheet = SpriteSheet("OpenGunnerEnemies.png")
 
         image = sprite_sheet.get_image(47, 215, 50, 50)
         self.idle_s_r.append(image)
@@ -143,7 +143,10 @@ class Turret(pygame.sprite.Sprite):
 
     def update(self):
         self.dist = math.hypot(self.rect.x - kilroy.rect.x, self.rect.y - kilroy.rect.y)
-        print(self.dist)
+        if kilroy.rect.x == 307:
+            # print(kilroy.rect.x)
+            # if kilroy.rect.x >= WIDTH / 2 - 100:
+            self.rect.x -= kilroy.speed_x
 
 
 class T_Bullet(pygame.sprite.Sprite):
@@ -157,7 +160,6 @@ class T_Bullet(pygame.sprite.Sprite):
         self.rect.y = t_bullet_y
 
     def update(self):
-
         if self.rect.x >= WIDTH or self.rect.y >= HEIGHT or self.rect.y <= 0 or self.rect.x <= 0:
             self.kill()
 
@@ -779,7 +781,10 @@ class Platform(pygame.sprite.Sprite):
         self.rect.y = plat_y
 
     def update(self):
-        self.rect.x -= kilroy.speed_x
+        if kilroy.rect.x == 307:
+            # print(kilroy.rect.x)
+            # if kilroy.rect.x >= WIDTH / 2 - 100:
+            self.rect.x -= kilroy.speed_x
 
 
 # ===============Add all Sprites=========
@@ -791,12 +796,12 @@ kilroy_group = pygame.sprite.Group()
 
 bullet_group = pygame.sprite.Group()
 
-turret = Turret(100, 300)
+turret = Turret(100, 400)
 all_sprites_list.add(turret)
 plat_groupp = pygame.sprite.Group()
 platfromer = Platform(100, 100)
-plat_x_2 = 50
-for i in range(36):
+plat_x_2 = 0
+for i in range(24):
     platfromer = Platform(plat_x_2, 450)
     plat_x_2 += 50
     plat_groupp.add(platfromer)
@@ -813,6 +818,7 @@ last_update = pygame.time.get_ticks()
 # =============== ==========game loop=====================
 running = True
 while running:
+    print(stage_pos_x, stage_pos_x + 800,kilroy.rect.x)
     mouse_x, mouse_y = pygame.mouse.get_pos()
     collide = pygame.sprite.spritecollide(kilroy, plat_groupp, False)
 
@@ -895,7 +901,8 @@ while running:
         stage_pos_x = -400
     elif kilroy.rect.x >= WIDTH / 2 - 100:
         stage_pos_x -= kilroy.speed_x
-        plat_x_2 -= kilroy.speed_x
+        print(kilroy.rect.x)
+
         kilroy.rect.x = WIDTH / 2 - 100
     screen.blit(space_back, [stage_pos_x, 0])
     all_sprites_list.update()
