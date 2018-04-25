@@ -26,7 +26,7 @@ GRAY = (128, 128, 128)
 PURPLE = (77, 75, 118)
 
 # =========================Sprites Images=====================
-img_dir = path.join(path.dirname(__file__), 'D:')
+img_dir = path.join(path.dirname(__file__), 'H:\\Images')
 
 space_back = pygame.image.load(path.join(img_dir, "full-background.png")).convert()
 space_back = pygame.transform.scale(space_back, [1200, HEIGHT])
@@ -92,7 +92,7 @@ class Turret(pygame.sprite.Sprite):
         self.idle_t_r = []
         self.shoot_t_r = []
 
-        sprite_sheet = SpriteSheet("OpenGunnerEnemies.png")
+        sprite_sheet = SpriteSheet("OpenGunnerEnemies (1).png")
 
         image = sprite_sheet.get_image(47, 215, 50, 50)
         self.idle_s_r.append(image)
@@ -507,9 +507,15 @@ class Player(pygame.sprite.Sprite):
             self.gravity = 6
             self.acc = -.4
         elif collide:
-            self.rect.bottom = platfromer.rect.top + 1
-            self.gravity = 0
-            self.acc = 0
+            if self.gravity < 0:
+                self.rect.bottom = platfromer.rect.top + 1
+                self.gravity = 0
+                self.acc = 0
+            if self.gravity > 0:
+                self.rect.top = platfromer.rect.bottom - 1
+                self.gravity = 0
+                self.acc = -0.4
+            if self.speed_x
         elif not collide and self.gravity == 0:
             self.gravity = -6
             self.acc = -.4
@@ -901,7 +907,6 @@ while running:
         stage_pos_x = -400
     elif kilroy.rect.x >= WIDTH / 2 - 100:
         stage_pos_x -= kilroy.speed_x
-        print(kilroy.rect.x)
 
         kilroy.rect.x = WIDTH / 2 - 100
     screen.blit(space_back, [stage_pos_x, 0])
