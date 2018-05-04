@@ -1,4 +1,4 @@
-import math
+     import math
 from os import path
 
 import pygame
@@ -24,9 +24,10 @@ BLUE = (0, 0, 255)
 GREEN = (0, 255, 0)
 GRAY = (128, 128, 128)
 PURPLE = (77, 75, 118)
+TEAL = (27, 192, 247)
 
 # =========================Sprites Images=====================
-img_dir = path.join(path.dirname(__file__), 'H:\\Images')
+img_dir = path.join(path.dirname(__file__), 'C:\\Users\\Dank Memes\\Downloads\\Game_Img')
 
 space_back = pygame.image.load(path.join(img_dir, "full-background.png")).convert()
 space_back = pygame.transform.scale(space_back, [1200, HEIGHT])
@@ -143,10 +144,6 @@ class Turret(pygame.sprite.Sprite):
 
     def update(self):
         self.dist = math.hypot(self.rect.x - kilroy.rect.x, self.rect.y - kilroy.rect.y)
-        if kilroy.rect.x == 307:
-            # print(kilroy.rect.x)
-            # if kilroy.rect.x >= WIDTH / 2 - 100:
-            self.rect.x -= kilroy.speed_x
 
 
 class T_Bullet(pygame.sprite.Sprite):
@@ -507,15 +504,9 @@ class Player(pygame.sprite.Sprite):
             self.gravity = 6
             self.acc = -.4
         elif collide:
-            if self.gravity < 0:
-                self.rect.bottom = platfromer.rect.top + 1
-                self.gravity = 0
-                self.acc = 0
-            if self.gravity > 0:
-                self.rect.top = platfromer.rect.bottom - 1
-                self.gravity = 0
-                self.acc = -0.4
-            if self.speed_x
+            self.rect.bottom = platform.rect.top + 1
+            self.gravity = 0
+            self.acc = 0
         elif not collide and self.gravity == 0:
             self.gravity = -6
             self.acc = -.4
@@ -702,8 +693,7 @@ class Player(pygame.sprite.Sprite):
                 if self.dir == "L":
                     self.image = self.idle_l[self.frame]
         self.rect.x += self.speed_x
-        if self.rect.bottom >= 540:
-            self.rect.bottom = 540
+
         if self.rect.left <= 0:
             self.rect.left = 0
             self.speed_x = 0
@@ -761,7 +751,6 @@ class Bullet(pygame.sprite.Sprite):
             self.mx, self.my = self.rect.x + 100, self.rect.y + 50
         if self.degrees_2 >= 45 and self.degrees_2 <= 70:
             self.mx, self.my = self.rect.x + 100, self.rect.y + 100
-        # print(self.radians)
         self.radians = math.atan2(self.my - self.rect.y, self.mx - self.rect.x)
         self.distance = math.hypot(self.mx - self.pmx, self.my - self.pmy) / self.speed
         self.distance = int(self.distance)
@@ -787,44 +776,60 @@ class Platform(pygame.sprite.Sprite):
         self.rect.y = plat_y
 
     def update(self):
-        if kilroy.rect.x == 307:
-            # print(kilroy.rect.x)
-            # if kilroy.rect.x >= WIDTH / 2 - 100:
-            self.rect.x -= kilroy.speed_x
+        self.rect.x -= kilroy.speed_x
 
 
 # ===============Add all Sprites=========
 all_sprites_list = pygame.sprite.Group()
 
-kilroy = Player()
-all_sprites_list.add(kilroy)
+# all_sprites_list.add(kilroy)
 kilroy_group = pygame.sprite.Group()
 
 bullet_group = pygame.sprite.Group()
+platform = Platform(0, 0)
 
 turret = Turret(100, 400)
 all_sprites_list.add(turret)
 plat_groupp = pygame.sprite.Group()
-platfromer = Platform(100, 100)
 plat_x_2 = 0
-for i in range(24):
-    platfromer = Platform(plat_x_2, 450)
-    plat_x_2 += 50
-    plat_groupp.add(platfromer)
-    all_sprites_list.add(platfromer)
 
 # ======================Define Variables=================
+level = [
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "W                                 W",
+    "W  P                              W",
+    "W                                 W",
+    "W                                 W",
+    "W                                 W",
+    "W                                 W",
+    "W                                 W",
+    "W                                 W",
+    "W       W    W                    W",
+    "W       W    W                    W",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
 
+]
 stage_pos_x = 0
-
+plat_x = plat_y = 0
 dx, dy = 0, 0
 distance = 0
 # speed = 14
+for row in level:
+    for col in row:
+        if col == "W":
+            platform = Platform(plat_x, plat_y)
+            all_sprites_list.add(platform)
+            plat_groupp.add(platform)
+        if col == 'P':
+            kilroy = Player()
+            all_sprites_list.add(kilroy)
+        plat_x += 50
+    plat_y += 50
+    plat_x = 0
 last_update = pygame.time.get_ticks()
 # =============== ==========game loop=====================
 running = True
 while running:
-    print(stage_pos_x, stage_pos_x + 800,kilroy.rect.x)
     mouse_x, mouse_y = pygame.mouse.get_pos()
     collide = pygame.sprite.spritecollide(kilroy, plat_groupp, False)
 
@@ -906,6 +911,7 @@ while running:
     if stage_pos_x <= -400:
         stage_pos_x = -400
     elif kilroy.rect.x >= WIDTH / 2 - 100:
+        turret.rect.x -= kilroy.speed_x
         stage_pos_x -= kilroy.speed_x
 
         kilroy.rect.x = WIDTH / 2 - 100
@@ -913,4 +919,5 @@ while running:
     all_sprites_list.update()
     all_sprites_list.draw(screen)
     pygame.display.flip()
+
 pygame.quit()
