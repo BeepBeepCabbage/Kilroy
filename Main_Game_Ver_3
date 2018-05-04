@@ -1,4 +1,4 @@
-     import math
+import math
 from os import path
 
 import pygame
@@ -27,7 +27,7 @@ PURPLE = (77, 75, 118)
 TEAL = (27, 192, 247)
 
 # =========================Sprites Images=====================
-img_dir = path.join(path.dirname(__file__), 'C:\\Users\\Dank Memes\\Downloads\\Game_Img')
+img_dir = path.join(path.dirname(__file__), 'H:\\Images')
 
 space_back = pygame.image.load(path.join(img_dir, "full-background.png")).convert()
 space_back = pygame.transform.scale(space_back, [1200, HEIGHT])
@@ -503,10 +503,6 @@ class Player(pygame.sprite.Sprite):
         if keystate[pygame.K_w] and collide:
             self.gravity = 6
             self.acc = -.4
-        elif collide:
-            self.rect.bottom = platform.rect.top + 1
-            self.gravity = 0
-            self.acc = 0
         elif not collide and self.gravity == 0:
             self.gravity = -6
             self.acc = -.4
@@ -514,9 +510,11 @@ class Player(pygame.sprite.Sprite):
             self.gravity = -30
         if self.gravity != 0:
             if self.dir == "R":
+                self.speed_x = 0
                 self.frame = 0
                 self.image = self.jump_frame_r[self.frame]
             if self.dir == "L":
+                self.speed_x = 0
                 self.frame = 0
                 self.image = self.jump_frame_l[self.frame]
 
@@ -776,7 +774,15 @@ class Platform(pygame.sprite.Sprite):
         self.rect.y = plat_y
 
     def update(self):
-        self.rect.x -= kilroy.speed_x
+        collide = pygame.sprite.spritecollide(kilroy, plat_groupp, False)
+        if collide:
+            kilroy.rect.bottom = self.rect.top + 1
+            kilroy.gravity = 0
+            kilroy.acc = 0
+        if stage_pos_x <= -400:
+            buttermilk = -400
+        elif kilroy.rect.x >= WIDTH / 2 - 100:
+            self.rect.x -= kilroy.speed_x
 
 
 # ===============Add all Sprites=========
@@ -795,18 +801,18 @@ plat_x_2 = 0
 
 # ======================Define Variables=================
 level = [
-    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-    "W                                 W",
-    "W  P                              W",
-    "W                                 W",
-    "W                                 W",
-    "W                                 W",
-    "W                                 W",
-    "W                                 W",
-    "W                                 W",
-    "W       W    W                    W",
-    "W       W    W                    W",
-    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWW",
+    "W                      W",
+    "W  P                   W",
+    "W                      W",
+    "W                      W",
+    "W                      W",
+    "W                      W",
+    "W                      W",
+    "W            W         W",
+    "W       W    W         W",
+    "W       W    W         W",
+    "WWWWWWWWWWWWWWWWWWWWWWWW",
 
 ]
 stage_pos_x = 0
@@ -830,6 +836,7 @@ last_update = pygame.time.get_ticks()
 # =============== ==========game loop=====================
 running = True
 while running:
+    print(platform.rect.y)
     mouse_x, mouse_y = pygame.mouse.get_pos()
     collide = pygame.sprite.spritecollide(kilroy, plat_groupp, False)
 
@@ -911,9 +918,7 @@ while running:
     if stage_pos_x <= -400:
         stage_pos_x = -400
     elif kilroy.rect.x >= WIDTH / 2 - 100:
-        turret.rect.x -= kilroy.speed_x
         stage_pos_x -= kilroy.speed_x
-
         kilroy.rect.x = WIDTH / 2 - 100
     screen.blit(space_back, [stage_pos_x, 0])
     all_sprites_list.update()
