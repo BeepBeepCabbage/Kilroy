@@ -27,7 +27,7 @@ PURPLE = (77, 75, 118)
 TEAL = (27, 192, 247)
 
 # =========================Sprites Images=====================
-img_dir = path.join(path.dirname(__file__), 'H:\\Images')
+img_dir = path.join(path.dirname(__file__), "C:\\Users\\Dank Memes\\Downloads\\Game_Img")
 
 space_back = pygame.image.load(path.join(img_dir, "full-background.png")).convert()
 space_back = pygame.transform.scale(space_back, [1200, HEIGHT])
@@ -774,7 +774,11 @@ class Platform(pygame.sprite.Sprite):
         self.rect.y = plat_y
 
     def update(self):
-        collide = pygame.sprite.spritecollide(kilroy, plat_groupp, False)
+        collide = pygame.sprite.spritecollide(self, kilroy_group, False)
+        # if collide and kilroy.speed_x > 0:
+        #     kilroy.rect.right = self.rect.left
+        # if collide and kilroy.speed_x < 0:
+        #     kilroy.rect.left = self.rect.right
         if collide:
             kilroy.rect.bottom = self.rect.top + 1
             kilroy.gravity = 0
@@ -828,6 +832,7 @@ for row in level:
             plat_groupp.add(platform)
         if col == 'P':
             kilroy = Player()
+            kilroy_group.add(kilroy)
             all_sprites_list.add(kilroy)
         plat_x += 50
     plat_y += 50
@@ -836,7 +841,6 @@ last_update = pygame.time.get_ticks()
 # =============== ==========game loop=====================
 running = True
 while running:
-    print(platform.rect.y)
     mouse_x, mouse_y = pygame.mouse.get_pos()
     collide = pygame.sprite.spritecollide(kilroy, plat_groupp, False)
 
