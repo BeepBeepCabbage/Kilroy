@@ -774,15 +774,11 @@ class Platform(pygame.sprite.Sprite):
         self.rect.y = plat_y
 
     def update(self):
-        collide = pygame.sprite.spritecollide(self, kilroy_group, False)
-        # if collide and kilroy.speed_x > 0:
-        #     kilroy.rect.right = self.rect.left
-        # if collide and kilroy.speed_x < 0:
-        #     kilroy.rect.left = self.rect.right
-        if collide:
-            kilroy.rect.bottom = self.rect.top + 1
-            kilroy.gravity = 0
-            kilroy.acc = 0
+       for kilroy in kilroy_group:
+            if self.rect.colliderect(kilroy.rect):
+                kilroy.rect.bottom = self.rect.top + 1
+                kilroy.gravity = 0
+                kilroy.acc = 0
         if stage_pos_x <= -400:
             buttermilk = -400
         elif kilroy.rect.x >= WIDTH / 2 - 100:
