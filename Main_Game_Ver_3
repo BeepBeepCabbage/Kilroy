@@ -27,7 +27,7 @@ PURPLE = (77, 75, 118)
 TEAL = (27, 192, 247)
 
 # =========================Sprites Images=====================
-img_dir = path.join(path.dirname(__file__), "C:\\Users\\Dank Memes\\Downloads\\Game_Img")
+img_dir = path.join(path.dirname(__file__), "H:\\Images")
 
 space_back = pygame.image.load(path.join(img_dir, "full-background.png")).convert()
 space_back = pygame.transform.scale(space_back, [1200, HEIGHT])
@@ -497,15 +497,15 @@ class Player(pygame.sprite.Sprite):
         self.acc = -.4
 
     def update(self):
-
         keystate = pygame.key.get_pressed()
-        collide = pygame.sprite.spritecollide(self, plat_groupp, False)
-        if keystate[pygame.K_w] and collide:
+        print(self.rect.center)
+
+        if keystate[pygame.K_w]:
             self.gravity = 6
             self.acc = -.4
-        elif not collide and self.gravity == 0:
-            self.gravity = -6
-            self.acc = -.4
+        # elif not collide and self.gravity == 0:
+        #     self.gravity = -6
+        #     self.acc = -.4
         if self.gravity <= -30:
             self.gravity = -30
         if self.gravity != 0:
@@ -774,15 +774,88 @@ class Platform(pygame.sprite.Sprite):
         self.rect.y = plat_y
 
     def update(self):
-       for kilroy in kilroy_group:
-            if self.rect.colliderect(kilroy.rect):
-                kilroy.rect.bottom = self.rect.top + 1
+        for kilroy in kilroy_group:
+            if pygame.sprite.spritecollide(dot_1, plat_groupp, False) and dot_1.col == 0:
+                dot_1.col = 1
+                print("top")
+                kilroy.rect.top = self.rect.bottom
+                # kilroy.gravity = 0
+                # kilroy.acc = 0
+            if pygame.sprite.spritecollide(dot_2, plat_groupp, False)and dot_2.col == 0:
+                dot_2.col = 1
+                print("right")
+                kilroy.rect.right = self.rect.left
+                # kilroy.gravity = 0
+                # kilroy.acc = 0
+            if pygame.sprite.spritecollide(dot_3, plat_groupp, False)and dot_3.col == 0:
+                dot_3.col = 1
+                print("bottom")
+                kilroy.rect.bottom = self.rect.top
                 kilroy.gravity = 0
                 kilroy.acc = 0
+            if pygame.sprite.spritecollide(dot_4, plat_groupp, False)and dot_4.col == 0:
+                dot_4.col = 1
+                print("left")
+                kilroy.rect.left = self.rect.right
+                # kilroy.gravity = 0
+                # kilroy.acc = 0
+            else:
+                dot_4.col = 0
+                dot_3.col = 0
+                dot_2.col = 0
+                dot_1.col = 0
         if stage_pos_x <= -400:
             buttermilk = -400
         elif kilroy.rect.x >= WIDTH / 2 - 100:
             self.rect.x -= kilroy.speed_x
+
+
+class Kil_Col_1(pygame.sprite.Sprite):
+    def __init__(self):
+        self.col = 0
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((20, 20))
+        self.image.fill(GREEN)
+        self.rect = self.image.get_rect()
+
+    def update(self):
+        self.rect.center = kilroy.rect.x + 25, kilroy.rect.y - 25
+
+
+class Kil_Col_2(pygame.sprite.Sprite):
+    def __init__(self):
+        self.col = 0
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((20, 20))
+        self.image.fill(GREEN)
+        self.rect = self.image.get_rect()
+
+    def update(self):
+        self.rect.center = kilroy.rect.x + 75, kilroy.rect.y + 25
+
+
+class Kil_Col_3(pygame.sprite.Sprite):
+    def __init__(self):
+        self.col = 0
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((20, 20))
+        # self.image.fill(GREEN)
+        self.rect = self.image.get_rect()
+
+    def update(self):
+        self.rect.center = kilroy.rect.x + 25, kilroy.rect.y + 75
+
+
+class Kil_Col_4(pygame.sprite.Sprite):
+    def __init__(self):
+        self.col = 0
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((20, 20))
+        self.image.fill(GREEN)
+        self.rect = self.image.get_rect()
+
+    def update(self):
+        self.rect.center = kilroy.rect.x - 25, kilroy.rect.y + 25
 
 
 # ===============Add all Sprites=========
@@ -798,6 +871,12 @@ turret = Turret(100, 400)
 all_sprites_list.add(turret)
 plat_groupp = pygame.sprite.Group()
 plat_x_2 = 0
+dot_1 = Kil_Col_1()
+dot_2 = Kil_Col_2()
+dot_3 = Kil_Col_3()
+dot_4 = Kil_Col_4()
+dot_g = pygame.sprite.Group()
+all_sprites_list.add(dot_4, dot_1, dot_2, dot_3)
 
 # ======================Define Variables=================
 level = [
