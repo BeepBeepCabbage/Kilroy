@@ -71,6 +71,23 @@ class SpriteSheet(object):
         return image
 
 
+class Platform(pygame.sprite.Sprite):
+    def __init__(self, plat_x, plat_y):
+        pygame.sprite.Sprite.__init__(self)
+        sprite_sheet = SpriteSheet("OpenGunnerStarterTiles.png")
+        self.image = sprite_sheet.get_image(74, 205, 51, 50)
+        self.rect = self.image.get_rect()
+        # self.image.fill(BLACK)
+        self.rect.x = plat_x
+        self.rect.y = plat_y
+
+    def update(self):
+        if stage_pos_x <= -400:
+            buttermilk = -400
+        elif kilroy.rect.x >= WIDTH / 2 - 100:
+            self.rect.x -= kilroy.speed_x
+
+
 class Turret(pygame.sprite.Sprite):
     def __init__(self, turret_x, turret_y):
         pygame.sprite.Sprite.__init__(self)
@@ -495,17 +512,21 @@ class Player(pygame.sprite.Sprite):
         self.image = self.idle_r[self.frame]
         self.gravity = -6
         self.acc = -.4
+        self.col = False
 
     def update(self):
         keystate = pygame.key.get_pressed()
-        print(self.rect.center)
+        block_hit_list = pygame.sprite.spritecollide(self, plat_groupp, False)
 
-        if keystate[pygame.K_w]:
+        if block_hit_list:
+            self.col = True
+            self.rect.bottom = platform.rect.top
+            self.gravity = 0
+            self.acc = 0
+        if keystate[pygame.K_w] and self.col == True:
+            self.col = False
             self.gravity = 6
             self.acc = -.4
-        # elif not collide and self.gravity == 0:
-        #     self.gravity = -6
-        #     self.acc = -.4
         if self.gravity <= -30:
             self.gravity = -30
         if self.gravity != 0:
@@ -517,7 +538,6 @@ class Player(pygame.sprite.Sprite):
                 self.speed_x = 0
                 self.frame = 0
                 self.image = self.jump_frame_l[self.frame]
-
         self.rect.y -= self.gravity
         self.gravity += self.acc
 
@@ -652,7 +672,7 @@ class Player(pygame.sprite.Sprite):
                     if self.frame >= 8:
                         self.frame = 0
 
-        elif self.gravity == 0:
+        elif :
             self.frame = 0
             self.speed_x = 0
             if degrees_2 <= 14.6 and degrees_2 >= -14.6 and collide:
@@ -698,6 +718,7 @@ class Player(pygame.sprite.Sprite):
         if self.rect.right >= WIDTH - 25:
             self.rect.right = WIDTH - 25
             self.speed_x = 0
+        print(self.gravity)
 
 
 class Bullet(pygame.sprite.Sprite):
@@ -763,101 +784,6 @@ class Bullet(pygame.sprite.Sprite):
             self.kill()
 
 
-class Platform(pygame.sprite.Sprite):
-    def __init__(self, plat_x, plat_y):
-        pygame.sprite.Sprite.__init__(self)
-        sprite_sheet = SpriteSheet("OpenGunnerStarterTiles.png")
-        self.image = sprite_sheet.get_image(74, 205, 51, 50)
-        self.rect = self.image.get_rect()
-        # self.image.fill(BLACK)
-        self.rect.x = plat_x
-        self.rect.y = plat_y
-
-    def update(self):
-        for kilroy in kilroy_group:
-            if pygame.sprite.spritecollide(dot_1, plat_groupp, False) and dot_1.col == 0:
-                dot_1.col = 1
-                print("top")
-                kilroy.rect.top = self.rect.bottom
-                # kilroy.gravity = 0
-                # kilroy.acc = 0
-            if pygame.sprite.spritecollide(dot_2, plat_groupp, False)and dot_2.col == 0:
-                dot_2.col = 1
-                print("right")
-                kilroy.rect.right = self.rect.left
-                # kilroy.gravity = 0
-                # kilroy.acc = 0
-            if pygame.sprite.spritecollide(dot_3, plat_groupp, False)and dot_3.col == 0:
-                dot_3.col = 1
-                print("bottom")
-                kilroy.rect.bottom = self.rect.top
-                kilroy.gravity = 0
-                kilroy.acc = 0
-            if pygame.sprite.spritecollide(dot_4, plat_groupp, False)and dot_4.col == 0:
-                dot_4.col = 1
-                print("left")
-                kilroy.rect.left = self.rect.right
-                # kilroy.gravity = 0
-                # kilroy.acc = 0
-            else:
-                dot_4.col = 0
-                dot_3.col = 0
-                dot_2.col = 0
-                dot_1.col = 0
-        if stage_pos_x <= -400:
-            buttermilk = -400
-        elif kilroy.rect.x >= WIDTH / 2 - 100:
-            self.rect.x -= kilroy.speed_x
-
-
-class Kil_Col_1(pygame.sprite.Sprite):
-    def __init__(self):
-        self.col = 0
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((20, 20))
-        self.image.fill(GREEN)
-        self.rect = self.image.get_rect()
-
-    def update(self):
-        self.rect.center = kilroy.rect.x + 25, kilroy.rect.y - 25
-
-
-class Kil_Col_2(pygame.sprite.Sprite):
-    def __init__(self):
-        self.col = 0
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((20, 20))
-        self.image.fill(GREEN)
-        self.rect = self.image.get_rect()
-
-    def update(self):
-        self.rect.center = kilroy.rect.x + 75, kilroy.rect.y + 25
-
-
-class Kil_Col_3(pygame.sprite.Sprite):
-    def __init__(self):
-        self.col = 0
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((20, 20))
-        # self.image.fill(GREEN)
-        self.rect = self.image.get_rect()
-
-    def update(self):
-        self.rect.center = kilroy.rect.x + 25, kilroy.rect.y + 75
-
-
-class Kil_Col_4(pygame.sprite.Sprite):
-    def __init__(self):
-        self.col = 0
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((20, 20))
-        self.image.fill(GREEN)
-        self.rect = self.image.get_rect()
-
-    def update(self):
-        self.rect.center = kilroy.rect.x - 25, kilroy.rect.y + 25
-
-
 # ===============Add all Sprites=========
 all_sprites_list = pygame.sprite.Group()
 
@@ -871,12 +797,6 @@ turret = Turret(100, 400)
 all_sprites_list.add(turret)
 plat_groupp = pygame.sprite.Group()
 plat_x_2 = 0
-dot_1 = Kil_Col_1()
-dot_2 = Kil_Col_2()
-dot_3 = Kil_Col_3()
-dot_4 = Kil_Col_4()
-dot_g = pygame.sprite.Group()
-all_sprites_list.add(dot_4, dot_1, dot_2, dot_3)
 
 # ======================Define Variables=================
 level = [
