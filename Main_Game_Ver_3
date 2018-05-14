@@ -27,11 +27,10 @@ PURPLE = (77, 75, 118)
 TEAL = (27, 192, 247)
 
 # =========================Sprites Images=====================
-img_dir = path.join(path.dirname(__file__), "C:\\Users\\4181843\\AppData\\Local\\Temp")
+img_dir = path.join(path.dirname(__file__), "H:\\Images")
 
-space_back = pygame.image.load(path.join(img_dir, "download.png")).convert()
+space_back = pygame.image.load(path.join(img_dir, "full-background.png")).convert()
 space_back = pygame.transform.scale(space_back, [1200, HEIGHT])
-img_dir = path.join(path.dirname(__file__), "C:\\Users\\4181843\\Downloads")
 
 # floor_tile_img = pygame.image.load(path.join(img_dir, "game_floor_tile.png")).convert()
 # hero_spritesheet = pygame.image.load(path.join(img_dir, "OpenGunnerHeroVer2.png")).convert()
@@ -40,7 +39,7 @@ img_dir = path.join(path.dirname(__file__), "C:\\Users\\4181843\\Downloads")
 # solider_spritesheet = pygame.image.load(path.join(img_dir, "OpenGunnerEnemySoldier.png")).convert()
 # tiles_spritesheet = pygame.image.load(path.join(img_dir, "OpenGunnerStarterTiles.png")).convert()
 
-bullet_img = pygame.image.load(path.join(img_dir, "new_bullet.png")).convert()
+bullet_img = pygame.image.load(path.join(img_dir, "bullet.png")).convert()
 bullet_img = pygame.transform.scale(bullet_img, [10, 10])
 
 
@@ -112,7 +111,7 @@ class Turret(pygame.sprite.Sprite):
         self.idle_t_r = []
         self.shoot_t_r = []
 
-        sprite_sheet = SpriteSheet("OpenGunnerEnemies.png")
+        sprite_sheet = SpriteSheet("OpenGunnerEnemies (1).png")
 
         image = sprite_sheet.get_image(47, 215, 50, 50)
         self.idle_s_r.append(image)
@@ -517,18 +516,20 @@ class Player(pygame.sprite.Sprite):
         self.col = False
 
     def update(self):
+        self
         block_hit_list = pygame.sprite.spritecollide(kilroy, plat_groupp, False)
         for platform in block_hit_list:
             if self.speed_x < 0:
                 self.rect.left = platform.rect.right
                 self.speed_x = 0
-                # kilroy.rect.x += 3
             elif self.speed_x > 0:
                 self.rect.right = platform.rect.left
                 self.speed_x = 0
+
+        block_hit_list = pygame.sprite.spritecollide(kilroy, plat_groupp, False)
+
         for platform in block_hit_list:
-            if self.gravity < 0 and self.rect.y <= platform.rect.y:
-                print(self.rect.y,platform.rect.y)
+            if self.gravity < 0:
                 self.col = True
                 self.rect.bottom = platform.rect.top
                 self.gravity = 0
@@ -539,8 +540,6 @@ class Player(pygame.sprite.Sprite):
                 self.acc = -.4
 
         keystate = pygame.key.get_pressed()
-
-
         if self.gravity <= -30:
             self.gravity = -30
         if self.gravity != 0:
@@ -727,6 +726,17 @@ class Player(pygame.sprite.Sprite):
                 if self.dir == "L":
                     self.image = self.idle_l[self.frame]
 
+    def calc_grav(self):
+        """ Calculate effect of gravity. """
+        if self.gravity == 0:
+            self.gravity = 1
+        else:
+            self.gravity += .35
+
+        # See if we are on the ground.
+        if self.rect.y >= HEIGHT - self.rect.height and self.gravity >= 0:
+            self.gravity = 0
+            self.rect.y = HEIGHT - self.rect.height
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, bullet_x, bullet_y):
@@ -815,9 +825,9 @@ level = [
     "W                      W",
     "W                      W",
     "W                      W",
-    "W   W        W         W",
-    "W       W    W         W",
-    "W       W    W         W",
+    "W   W                  W",
+    "W            W         W",
+    "W        W             W",
     "WWWWWWWWWWWWWWWWWWWWWWWW",
 
 ]
@@ -936,3 +946,4 @@ while running:
     pygame.display.flip()
 
 pygame.quit()
+
