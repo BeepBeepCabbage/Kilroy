@@ -1,3 +1,4 @@
+
 import math
 from os import path
 
@@ -516,7 +517,10 @@ class Player(pygame.sprite.Sprite):
         self.col = False
 
     def update(self):
-        self
+        if self.rect.left <= 0:
+            self.rect.left = 0
+        if self.rect.right >= WIDTH:
+            self.rect.right = WIDTH
         block_hit_list = pygame.sprite.spritecollide(kilroy, plat_groupp, False)
         for platform in block_hit_list:
             if self.speed_x < 0:
@@ -536,9 +540,12 @@ class Player(pygame.sprite.Sprite):
                 self.acc = 0
             elif self.gravity > 0:
                 self.rect.top = platform.rect.bottom
-                self.gravity = 0
-                self.acc = -.4
-
+            self.gravity = 0
+        self.rect.y += 2
+        c_g = pygame.sprite.spritecollide(kilroy, plat_groupp, False)
+        self.rect.y -= 2
+        if len(c_g) == 0:
+            self.acc = -.4
         keystate = pygame.key.get_pressed()
         if self.gravity <= -30:
             self.gravity = -30
@@ -711,7 +718,7 @@ class Player(pygame.sprite.Sprite):
             if degrees_2 >= -135 and degrees_2 <= -100 and self.col:
                 self.dir = "L"
                 self.image = self.idle_top_aim_l[self.frame]
-            if degrees_2 >= -165.4 and degrees_2 <= -135 and collide:
+            if degrees_2 >= -165.4 and degrees_2 <= -135 and self.col:
                 self.dir = "L"
                 self.image = self.idle_mid_aim_l[self.frame]
             if degrees_2 > 105.5 and degrees_2 < 135 and self.col:
@@ -854,7 +861,12 @@ last_update = pygame.time.get_ticks()
 running = True
 while running:
     mouse_x, mouse_y = pygame.mouse.get_pos()
+    kilroy.rect.y += 2
     collide = pygame.sprite.spritecollide(kilroy, plat_groupp, False)
+    print(len(collide))
+    kilroy.rect.y -= 2
+    print("butter milk")
+    print(len(collide))
 
     now = pygame.time.get_ticks()
     screen.fill(BLACK)
@@ -868,7 +880,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_w and kilroy.col:
+            if event.key == pygame.K_w and len(collide) > 0:
                 kilroy.col = False
                 kilroy.gravity = 6
                 kilroy.acc = -.4
@@ -946,4 +958,3 @@ while running:
     pygame.display.flip()
 
 pygame.quit()
-
